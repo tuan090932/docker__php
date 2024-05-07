@@ -37,8 +37,10 @@ Route::add('/product/form_editProduct/(\d+)', 'ProductController@form_editProduc
 
 Route::add('/product/edit', 'ProductController@handle_edit');
 
+//Route::add('/product/search', 'ProductController@productSearch');
 
 
+Route::add('/product/search', 'ProductController@productSearch');
 
 //Route::add('/product/detail/(\d+)', 'ProductController@productdetail');
 //$router->add('/product/list', ['controller' => 'ProductController', 'action' => 'productList']);

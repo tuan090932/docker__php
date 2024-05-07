@@ -17,7 +17,7 @@
     require_once "nav.php";
     ?>
     <main class="container">
-        <form action="<?= BASE_PATH ?>/product/edit" method="post">
+        <form action="<?= BASE_PATH ?>/product/edit" method="post" enctype="multipart/form-data">
             <div class="form-group">
                 <label for="bookname">Tên Sản Phẩm:</label>
                 <input type="text" class="form-control" id="bookname" name="bookname">
@@ -30,10 +30,9 @@
             <div class="row mb-2">
                 <label>Hình ảnh</label>
                 <br>
-                <img src="../uploads/<?= $book['hinh'] ?>" class="card-img-top" alt="..." style="width: 200px; height: 200px;">
+                <img src="../image/<?= $book['hinh'] ?>" class="card-img-top" alt="..." style="width: 200px; height: 200px;">
                 <input type="file" name="hinh" class="mr-1 col-5" value="<?= $book['hinh'] ?>">
             </div>
-
 
 
             <input type="hidden" name="id" value="<?= $finalValue ?>">
@@ -48,3 +47,14 @@
 </body>
 
 </html>
+
+
+<script>
+    document.querySelector('input[type="file"]').addEventListener('change', function(e) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            document.querySelector('img.card-img-top').src = e.target.result;
+        }
+        reader.readAsDataURL(this.files[0]);
+    });
+</script>

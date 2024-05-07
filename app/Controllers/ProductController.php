@@ -81,6 +81,21 @@ class ProductController extends BaseController
         require_once '../app/Views/editProduct.php';
     }
 
+    public function productSearch()
+    {
+        if (isset($_GET['query'])) {
+            echo $_GET['query'];
+            $products = $this->productModel->searchProduct($_GET['query']);
+            //echo $products;
+
+            // $data = compact('products');
+            require_once '../app/Views/showProduct.php';
+            // $data = compact('products');
+            // require_once '../app/Views/product_list.php';
+        }
+    }
+
+
 
     public function handle_deleteProduct()
     {
@@ -104,17 +119,57 @@ class ProductController extends BaseController
         $product = $this->productModel->deleteProduct($finalValue);
     }
 
+    function extractFileName($path)
+    {
+        // Tách tên tệp từ đường dẫn đến tệp
+        $filename = basename($path);
 
+        // Trả về tên tệp đã xử lý
+        return $filename;
+    }
     public function handle_edit()
     {
+
+
+
 
         if (isset($_POST['id'])) {
             $bookname = $_POST['bookname'];
             $mota = $_POST['mota'];
+
+            //tiếp tục code lấy giá trị từ sau khi upload xuống 
+            // Check if file was uploaded
+            //$_POST['hinh'] = $_FILES['hinh']['name'];
+            if (isset($_FILES['hinh'])) {
+                $target_dir = "./image/";
+                if (!is_dir($target_dir)) {
+                    echo "Directory does not exist: $target_dir";
+                } elseif (!is_writable($target_dir)) {
+                    echo "Directory is not writable: $target_dir";
+                } else {
+                    $target_file = $target_dir . basename($_FILES["hinh"]["name"]);
+                    if (move_uploaded_file($_FILES["hinh"]["tmp_name"], $target_file)) {
+                        $hinh = $target_file;
+                        echo $hinh;
+                        // chèn cái này = cái lúc đầu ->output nó là  ./image/Screenshot 2024-03-06 232352.png
+                        echo "thanh công";
+                    } else {
+                        echo "Sorry, there was an error uploading your file.";
+                    }
+                }
+            }
+
+            echo $hinh;
+
+            $hinh = $this->extractFileName($hinh);
+            // echo $hinh;
+
             $product = [
                 'bookname' => $bookname,
                 'mota' => $mota,
+                'hinh' => $hinh,
             ];
+
 
             $this->productModel->editProduct($_POST['id'], $product);
         }

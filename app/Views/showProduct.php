@@ -10,15 +10,7 @@
 </head>
 
 <body>
-    <header class="mb-4">
-        <h1 class="text-center">DANH SÁCH SẢN PHẨM</h1>
-        <div class="container">
-            <form action="<?= BASE_PATH ?>/product/search" method="get" class="form-inline my-2 my-lg-0">
-                <input class="form-control mr-sm-2" type="search" placeholder="Tìm kiếm sách" aria-label="Search" name="query">
-                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Tìm kiếm</button>
-            </form>
-        </div>
-    </header>
+
 
 
     <?php

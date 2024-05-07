@@ -73,14 +73,31 @@ class ProductModel extends BaseModel implements IProductModel
     }
 
 
+    public function productSearch()
+    {
+        if (isset($_GET['query'])) {
+            echo $_GET['query'];
+        }
+    }
 
+    public function searchProduct($query)
+    {
+
+
+        $this->db->query("SELECT * FROM book WHERE bookname LIKE :query");
+        $this->db->bind(':query', '%' . $query . '%');
+        $results = $this->db->resultSet();
+        return $results;
+    }
 
     public function editProduct($id, $productData)
     {
-        $this->db->query("UPDATE book SET bookname = :bookname, mota = :mota WHERE id_book = :id");        // Bind values
+        $this->db->query("UPDATE book SET bookname = :bookname, mota = :mota ,hinh=:hinh WHERE id_book = :id");        // Bind values
         $this->db->bind(':id', $id);
         $this->db->bind(':bookname', $productData['bookname']);
         $this->db->bind(':mota', $productData['mota']);
+        $this->db->bind(':hinh', $productData['hinh']);
+
         // Get current date and time
         // $now = new \DateTime();
         // $this->db->bind(':updated_at', $now->format('Y-m-d H:i:s'));
