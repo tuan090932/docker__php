@@ -20,9 +20,34 @@ use App\Routing\Route;
 //Route::add('/index', 'HomeController@index');
 //echo "<pre>" . print_r(Route::showroutes()) . "</pre>";
 
+
+
+
+
+
+
+
+
+
 Route::add('/product/list', 'ProductController@productList');
 
-Route::add('/product/create', 'ProductController@createProduct');
+
+
+
+//Route::add('/product/create', 'ProductController@createProduct');
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 //Route::add('/product/handle_create', 'ProductController@handle_createProduct');
 
@@ -31,16 +56,22 @@ Route::add('/product/create', 'ProductController@createProduct');
 
 
 // i want add edit -> give me route edit
-Route::add('/product/view/(\d+)', 'ProductController@handle_viewProduct');
-Route::add('/product/delete/(\d+)', 'ProductController@handle_deleteProduct');
-Route::add('/product/form_editProduct/(\d+)', 'ProductController@form_editProduct');
 
+Route::add('/product/list/view/(\d+)', 'ProductController@handle_viewProduct');
+Route::add('/product/list/delete/(\d+)', 'ProductController@handle_deleteProduct');
+Route::add('/product/list/form_editProduct/(\d+)', 'ProductController@form_editProduct');
 Route::add('/product/edit', 'ProductController@handle_edit');
+Route::add('/product/list/search', 'ProductController@productSearch');
+
+
 
 //Route::add('/product/search', 'ProductController@productSearch');
 
+Route::add('/login_get', 'AuthController@login_get');
+Route::add('/login_post', 'AuthController@login_post');
+Route::add('/register_get', 'AuthController@register_get');
+Route::add('/register_post', 'AuthController@register_post');
 
-Route::add('/product/search', 'ProductController@productSearch');
 
 //Route::add('/product/detail/(\d+)', 'ProductController@productdetail');
 //$router->add('/product/list', ['controller' => 'ProductController', 'action' => 'productList']);

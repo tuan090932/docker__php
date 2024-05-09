@@ -20,9 +20,8 @@ class ProductModel extends BaseModel implements IProductModel
             //$this->db->query("SHOW TABLES");
 
             $this->db->query("SELECT * FROM book");
-            $this->log("Getting all products from " . __FILE__);
+            // $this->log("Getting all products from " . __FILE__);
             //-> output là  file này "C:\xampp\htdocs\PHP_MVC\app\Models\ProductModel.php"
-
             return $this->db->resultSet();
         } catch (Exception $e) {
             // Xử lý lỗi ở đây
@@ -92,19 +91,23 @@ class ProductModel extends BaseModel implements IProductModel
 
     public function editProduct($id, $productData)
     {
-        $this->db->query("UPDATE book SET bookname = :bookname, mota = :mota ,hinh=:hinh WHERE id_book = :id");        // Bind values
+
+
+
+
+        $this->db->query("UPDATE book SET bookname = :bookname, mota = :mota ,hinh=:hinh,rating=:rating,nxb=:nxb,author=:author,price=:price,id_danhmuc=:id_danhmuc WHERE id_book = :id");
         $this->db->bind(':id', $id);
         $this->db->bind(':bookname', $productData['bookname']);
         $this->db->bind(':mota', $productData['mota']);
         $this->db->bind(':hinh', $productData['hinh']);
+        $this->db->bind(':rating', $productData['rating']); // Add this line
+        $this->db->bind(':nxb', $productData['nxb']);
+        $this->db->bind(':author', $productData['author']);
+        $this->db->bind(':price', $productData['price']);
+        $this->db->bind(':id_danhmuc', $productData['id_danhmuc']);
 
-        // Get current date and time
-        // $now = new \DateTime();
-        // $this->db->bind(':updated_at', $now->format('Y-m-d H:i:s'));
-        // Execute
         if ($this->db->execute()) {
             echo "<script>alert('update thành công');</script>";
-
             return true;
         } else {
             return false;

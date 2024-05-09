@@ -19,13 +19,42 @@
     <main class="container">
         <form action="<?= BASE_PATH ?>/product/edit" method="post" enctype="multipart/form-data">
             <div class="form-group">
-                <label for="bookname">Tên Sản Phẩm:</label>
+                <label for="bookname">Title:</label>
                 <input type="text" class="form-control" id="bookname" name="bookname">
             </div>
+
             <div class="form-group">
-                <label for="mota">Mô Tả:</label>
+                <label for="mota">Body:</label>
                 <input type="text" class="form-control" id="mota" name="mota">
             </div>
+
+            <div class="form-group">
+                <label for="Rating">Rating:</label>
+                <input type="number" class="form-control" id="Rating" name="Rating">
+            </div>
+
+            <div class="form-group">
+                <label for="Publisher">Publisher:</label>
+                <input type="text" class="form-control" id="Publisher" name="Publisher">
+            </div>
+
+            <div class="form-group">
+                <label for="Author">Author:</label>
+                <input type="text" class="form-control" id="Author" name="Author">
+            </div>
+
+            <div class="form-group">
+                <label for="Price">Price:</label>
+                <input type="number" class="form-control" id="Price" name="Price">
+            </div>
+
+            <div class="form-group">
+                <label for="Category_Id">Category Id:</label>
+                <input type="number" class="form-control" id="Category_Id" name="Category_Id">
+            </div>
+
+
+
 
             <div class="row mb-2">
                 <label>Hình ảnh</label>

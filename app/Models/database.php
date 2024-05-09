@@ -32,10 +32,10 @@ class Database
             $tables = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
             // Hiển thị tất cả các bảng
-            echo "Các bảng trong cơ sở dữ liệu:<br>";
-            foreach ($tables as $table) {
-                echo $table . "<br>";
-            }
+            ///echo "Các bảng trong cơ sở dữ liệu:<br>";
+            //oreach ($tables as $table) {
+            //   echo $table . "<br>";
+            //  }
         } catch (PDOException $e) {
             // Xử lý lỗi nếu kết nối không thành công
             die("Connection failed: " . $e->getMessage());

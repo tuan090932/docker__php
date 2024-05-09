@@ -22,9 +22,19 @@ class ProductController extends BaseController
     {
         //VarDumper::dump("helo");
 
-        $products = $this->productModel->getAllProducts();
-        $data = compact('products');
-        require_once '../app/Views/product_list.php';
+        try {
+            if (isset($_COOKIE['loggedin'])) {
+                $products = $this->productModel->getAllProducts();
+                //$data = compact('products');
+                require_once '../app/Views/product_list.php';
+            } else {
+                throw new Exception("Cookie 'loggedin' is not set or false");
+            }
+        } catch (Exception $e) {
+            error_log($e->getMessage());
+            header('Location:/login_get');
+            exit();
+        }
     }
 
     public function createProduct()
@@ -35,6 +45,7 @@ class ProductController extends BaseController
 
     public function handle_createProduct()
     {
+
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $validator = new FormValidator($_POST);
             try {
@@ -72,9 +83,11 @@ class ProductController extends BaseController
         $pathParts = explode('/', $url['path']);
 
         // Get the last part of the path, which should be the final value
-        $finalValue = end($pathParts);
 
-        echo $finalValue;
+
+        //$finalValue = end($pathParts);
+
+        // echo $finalValue;
 
         //compact($finalValue);
 
@@ -129,14 +142,18 @@ class ProductController extends BaseController
     }
     public function handle_edit()
     {
-
-
-
-
         if (isset($_POST['id'])) {
             $bookname = $_POST['bookname'];
             $mota = $_POST['mota'];
+            $rating = $_POST['Rating'];
 
+            $nxb = $_POST['Publisher'];
+
+            $author = $_POST['Author'];
+
+            $id_danhmuc = $_POST['Category_Id'];
+
+            $price = $_POST['Price'];
             //tiếp tục code lấy giá trị từ sau khi upload xuống 
             // Check if file was uploaded
             //$_POST['hinh'] = $_FILES['hinh']['name'];
@@ -168,9 +185,12 @@ class ProductController extends BaseController
                 'bookname' => $bookname,
                 'mota' => $mota,
                 'hinh' => $hinh,
+                'rating' => $rating,
+                'nxb' => $nxb,
+                'author' => $author,
+                'price' => $price,
+                'id_danhmuc' => $id_danhmuc
             ];
-
-
             $this->productModel->editProduct($_POST['id'], $product);
         }
     }
@@ -178,32 +198,10 @@ class ProductController extends BaseController
 
 
 
-    public function handleLogin()
-    {
-        // ... authentication logic ...
-        session_start();
 
-        // Set cookies for username and address
-        setcookie("username", "tuan ne", time() + (86400 * 30), "/"); // 86400 = 1 day
-        setcookie("address", "ktx khu a", time() + (86400 * 30), "/");
-        echo "<script>alert('setcookie thanh cong ');</script>";
-
-        //lay gia tri tu cookie -> show ra
-        echo "<script>alert('Title: " . $_COOKIE['username'] . "\\nBody: " . $_COOKIE['address'] . "');</script>";
-
-
-        // ... rest of the method ...
-    }
 
     public function handle_viewProduct()
     {
-
-
-
-
-
-
-
 
         // VarDumper::dump("helo");
         if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on')
