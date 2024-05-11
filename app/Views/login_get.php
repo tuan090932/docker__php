@@ -1,5 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
+<?php
+
+
+
+?>
 
 <head>
     <meta charset="UTF-8" />
@@ -25,15 +30,29 @@
                                 <label for="email">
                                     Email
                                 </label>
-                                <input type="email" name="email" class="form-control" id="email" placeholder="Email" required />
+                                <input type="email" name="email" class="form-control" id="email" value="<?php if (isset($_COOKIE["email"])) {
+                                                                                                            echo $_COOKIE["email"];
+                                                                                                        } ?>" placeholder="Email" required />
                             </div>
                             <div class="form-group">
                                 <label for="password">
                                     Password
                                 </label>
-                                <input type="password" name="password" class="form-control" id="password" placeholder="Password" required />
+                                <input type="password" name="password" class="form-control" id="password" value="<?php if (isset($_COOKIE["password_hash"])) {
+                                                                                                                        echo $_COOKIE["password_hash"];
+                                                                                                                    } ?>" placeholder="Password" required />
                             </div>
-                            <button class="btn btn-danger">
+
+                            <div class="form-group" style="text-align:left;">
+                                <label><input type="checkbox" name="remember" <?php
+                                                                                if (isset($_COOKIE["remember"])) {
+                                                                                    echo "checked";
+                                                                                }
+
+
+                                                                                ?>> Remember me </label>
+                            </div>
+                            <button class="btn btn-danger" name="login">
                                 Login
                             </button>
                         </form>
@@ -42,11 +61,23 @@
                             <a href="register_get">Create an
                                 account</a>
                         </p>
+                        <span> <?php
+                                session_start();
+
+                                // $_SESSION["message"];
+                                if (isset($_COOKIE["message"])) {
+                                    echo $_COOKIE["message"];
+                                } else {
+                                    //echo "Everything is fine";
+                                }
+
+                                ?> </span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </body>
+
 
 </html>

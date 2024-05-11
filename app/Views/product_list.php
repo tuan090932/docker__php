@@ -21,6 +21,11 @@
 
 
 <body>
+
+
+
+
+
     <header class="" style="margin-top: 100px;">
 
     </header>
@@ -38,6 +43,12 @@
             <!-- create a drop dow in order to handle sort price desend and ascend use boostrap -->
 
         </div>
+
+
+
+        <li class="nav-item">
+            <a class="nav-link" href="<?= BASE_PATH ?>/logout_post">Đăng xuất</a>
+        </li>
 
         <main class="">
             <table class="table table-striped table-responsive-md">

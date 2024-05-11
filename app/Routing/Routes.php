@@ -72,6 +72,7 @@ Route::add('/login_post', 'AuthController@login_post');
 Route::add('/register_get', 'AuthController@register_get');
 Route::add('/register_post', 'AuthController@register_post');
 
+Route::add('/logout_post', 'AuthController@logout_post');
 
 //Route::add('/product/detail/(\d+)', 'ProductController@productdetail');
 //$router->add('/product/list', ['controller' => 'ProductController', 'action' => 'productList']);

@@ -8,33 +8,68 @@ use Symfony\Component\VarDumper\VarDumper;
 use function App\Controllers\view;
 use Exception;
 
+
+
+namespace App\Controllers;
+
+use App\Models\ProductModel;
+use App\Services\HandleLoginService;
+
+use App\Models\UserModel;
+
+
+
+
+
 class ProductController extends BaseController
 {
     private $productModel;
+    private $HandleLoginService;
 
+    private $UserModel;
     public function __construct()
     {
         parent::__construct();
+        $this->HandleLoginService = new HandleLoginService();
         $this->productModel = new ProductModel();
+        $this->UserModel = new UserModel();
     }
 
     public function productList()
     {
         //VarDumper::dump("helo");
 
-        try {
-            if (isset($_COOKIE['loggedin'])) {
-                $products = $this->productModel->getAllProducts();
-                //$data = compact('products');
-                require_once '../app/Views/product_list.php';
-            } else {
-                throw new Exception("Cookie 'loggedin' is not set or false");
-            }
-        } catch (Exception $e) {
-            error_log($e->getMessage());
+
+
+
+
+
+        if ($this->HandleLoginService->checkSession()) {
+            $products = $this->productModel->getAllProducts();
+            //$data = compact('products');
+            require_once '../app/Views/product_list.php';
+        } else {
             header('Location:/login_get');
             exit();
         }
+
+
+
+
+
+
+
+
+        //    try {
+        //       if (isset($_COOKIE['username'])) {
+        //         } else {
+        //             throw new Exception("Cookie 'loggedin' is not set or false");
+        //         }
+        //     } catch (Exception $e) {
+        //         error_log($e->getMessage());
+        //         header('Location:/login_get');
+        //         exit();
+        //     }
     }
 
     public function createProduct()
