@@ -1,0 +1,25 @@
+<phpunit bootstrap="vendor/autoload.php"
+    backupGlobals="false"
+    backupStaticAttributes="false"
+    colors="true"
+    convertErrorsToExceptions="true"
+    convertNoticesToExceptions="true"
+    convertWarningsToExceptions="true"
+    processIsolation="false"
+    stopOnFailure="false">
+
+    <php>
+       <env name="DB_HOST" value="mysql"/>
+    <env name="DB_PORT" value="3306"/>
+    <env name="DB_DATABASE" value="tranining_php"/>
+    <env name="DB_USERNAME" value="root"/>
+    <env name="DB_PASSWORD" value="root"/>
+    </php>
+
+    <testsuites>
+        <testsuite name="Project Test Suite">
+            <directory>tests</directory>
+        </testsuite>
+    </testsuites>
+
+</phpunit>

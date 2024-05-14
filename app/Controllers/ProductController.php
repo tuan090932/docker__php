@@ -39,26 +39,14 @@ class ProductController extends BaseController
     {
         //VarDumper::dump("helo");
 
-
-
-
-
-
         if ($this->HandleLoginService->checkSession()) {
             $products = $this->productModel->getAllProducts();
             //$data = compact('products');
-            require_once '../app/Views/product_list.php';
+            require_once '../app/Views/product/product_list.php';
         } else {
             header('Location:/login_get');
             exit();
         }
-
-
-
-
-
-
-
 
         //    try {
         //       if (isset($_COOKIE['username'])) {
@@ -120,13 +108,14 @@ class ProductController extends BaseController
         // Get the last part of the path, which should be the final value
 
 
-        //$finalValue = end($pathParts);
+        $finalValue = end($pathParts);
 
         // echo $finalValue;
 
         //compact($finalValue);
-
-        require_once '../app/Views/editProduct.php';
+        //require_once, các biến hiện tại được sử dụng trong phạm vi hàm gọi đó sẽ có thể truy cập được trong tệp tin được gọi
+        // -> finalValue được gọi vì dùng require_onmce
+        require_once '../app/Views/product/editProduct.php';
     }
 
     public function productSearch()
@@ -137,7 +126,8 @@ class ProductController extends BaseController
             //echo $products;
 
             // $data = compact('products');
-            require_once '../app/Views/showProduct.php';
+
+            require_once '../app/Views/product/showProduct.php';
             // $data = compact('products');
             // require_once '../app/Views/product_list.php';
         }

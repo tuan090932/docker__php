@@ -33,6 +33,12 @@ services:
       - ./docker/php-fpm/php-ini-overrides.ini:/etc/php/8.1/fpm/conf.d/99-overrides.ini
     networks:
       tranining_php_network:
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_DATABASE: tranining_php
+      DB_USERNAME: root
+      DB_PASSWORD: root
 
 networks:
   tranining_php_network:

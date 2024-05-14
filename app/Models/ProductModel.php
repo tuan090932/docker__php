@@ -2,13 +2,11 @@
 
 namespace App\Models;
 
-use App\Traits\Loggable;
 
 use Exception;
 // tự hiểu auto_load sẽ add vào
-class ProductModel extends BaseModel implements IProductModel
+class ProductModel extends BaseModel
 {
-    use Loggable;
 
     public function getAllProducts()
     {
@@ -25,7 +23,7 @@ class ProductModel extends BaseModel implements IProductModel
             return $this->db->resultSet();
         } catch (Exception $e) {
             // Xử lý lỗi ở đây
-            $this->log("Caught exception: " . $e->getMessage());
+            // $this->log("Caught exception: " . $e->getMessage());
             echo 'Caught exception: ',  $e->getMessage(), "\n";
         }
     }
@@ -91,8 +89,6 @@ class ProductModel extends BaseModel implements IProductModel
 
     public function editProduct($id, $productData)
     {
-
-
 
 
         $this->db->query("UPDATE book SET bookname = :bookname, mota = :mota ,hinh=:hinh,rating=:rating,nxb=:nxb,author=:author,price=:price,id_danhmuc=:id_danhmuc WHERE id_book = :id");

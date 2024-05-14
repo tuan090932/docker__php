@@ -20,15 +20,6 @@ use App\Routing\Route;
 //Route::add('/index', 'HomeController@index');
 //echo "<pre>" . print_r(Route::showroutes()) . "</pre>";
 
-
-
-
-
-
-
-
-
-
 Route::add('/product/list', 'ProductController@productList');
 
 
@@ -62,6 +53,9 @@ Route::add('/product/list/delete/(\d+)', 'ProductController@handle_deleteProduct
 Route::add('/product/list/form_editProduct/(\d+)', 'ProductController@form_editProduct');
 Route::add('/product/edit', 'ProductController@handle_edit');
 Route::add('/product/list/search', 'ProductController@productSearch');
+
+
+Route::add('/check_login_ajax', 'AuthController@check_login_ajax');
 
 
 

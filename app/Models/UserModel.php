@@ -2,22 +2,19 @@
 
 namespace App\Models;
 
-use App\Traits\Loggable;
 
 use Exception;
 // tự hiểu auto_load sẽ add vào
 class UserModel extends BaseModel
 {
-    use Loggable;
 
 
 
-    public function handle_login($User, $remember)
-    {
-    }
+
 
     public function CreateUser($User)
     {
+
         // Hash the password
         $hashedPassword = password_hash($User['password'], PASSWORD_DEFAULT);
         //dung ham password_hash

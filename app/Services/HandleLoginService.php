@@ -6,6 +6,7 @@ use App\Models\ProductModel;
 use App\Models\UserModel;
 use App\Models\BaseModel;
 use App\Models\Database; // Import the Database class
+use Exception;
 
 class HandleLoginService extends BaseModel
 {
@@ -38,14 +39,20 @@ class HandleLoginService extends BaseModel
         return false;
     }
 
+
     public function handle_login($User, $remember)
     {
+
+
+
+
+        //session_start();
+
         // Prepare a select statement
         // Prepare a select statement
+
         $this->db->query("SELECT * FROM user_info WHERE email_address = :email");
-        // Bind the email to the prepared statement
         $this->db->bind(':email', $User['email']);
-        // Execute the statement
         $row = $this->db->single();
 
         // Check if the email exists in the database
@@ -53,7 +60,6 @@ class HandleLoginService extends BaseModel
             // Verify the password
             if (password_verify($User['password'], $row['password'])) {
                 // Password is correct, so start a new session
-                session_start();
 
                 // Store data in session variables
                 // $session_Id = session_id(); // để sau này check mỗi lần request
@@ -68,51 +74,116 @@ class HandleLoginService extends BaseModel
                 $this->UserModel->InsertSession($randomNumber);
                 $_SESSION["address"] = $row['address'];
                 $_SESSION["phone_number"] = $row['phone_number'];
+
                 // If remember me is checked, set cookies
                 if ($remember) {
-                    $cookieExpiration = time() + (1000); // 86400 = 1 day
-                    setcookie("password_hash", $User['password'], $cookieExpiration, "/");
+                    $cookieExpiration = time() + (86400); // 86400 = 1 day
+
                     setcookie("email",  $row['email_address'], $cookieExpiration, "/");
                     setcookie("username", $row['username'], $cookieExpiration, "/");
                     setcookie("remember", $remember, $cookieExpiration, "/");
                     setcookie("session_Id", $randomNumber, $cookieExpiration, "/");
-                    // echo $randomNumber;
-                    // exit;
-                    // tạo 1 biến show thời hạn của của cookie  này
-                    // $date = date('Y-m-d H:i:s', $cookieExpiration);
-                    //   $decodedString = urldecode($date);
-                    //echo "ham nay run chua";
-                    //exit;
                     setcookie("address", $row['address'], $cookieExpiration, "/");
                     setcookie("phone_number", $row['phone_number'], $cookieExpiration, "/");
+                    $remainingTime = $cookieExpiration - time();
+                    // Store the remaining time in a cookie
+                    setcookie("remaining_time", $remainingTime, $cookieExpiration, "/");
+                    header("location: /product/list");
                 }
-                // If remember me is not checked, delete cookies
+                // If remember me is not checked, dele  te cookies
 
-                $cookieExpiration = time() + (1000); // 86400 = 1 day
-                setcookie("session_Id", $randomNumber, $cookieExpiration, "/");
-                setcookie("username", $row['username'], $cookieExpiration, "/");
-                setcookie("address", $row['address'], $cookieExpiration, "/");
-                setcookie("phone_number", $row['phone_number'], $cookieExpiration, "/");
-                // Redirect user to home page
-                //  echo "ham nay run chua";
-                // exit;
-                header("location: /product/list");
+                if ($remember == false) {
+                    $cookieExpiration = time() + (10); //là số giây là 10 giây // 86400 = 1 day
+                    setcookie("email",  $row['email_address'], $cookieExpiration, "/");
+                    setcookie("username", $row['username'], $cookieExpiration, "/");
+                    setcookie("remember", '0', $cookieExpiration, "/");
+                    setcookie("session_Id", $randomNumber, $cookieExpiration, "/");
+                    setcookie("address", $row['address'], $cookieExpiration, "/");
+                    setcookie("phone_number", $row['phone_number'], $cookieExpiration, "/");
+                    // Calculate the remaining time for the cookie to expire
+                    $remainingTime = $cookieExpiration - time();
+                    // Store the remaining time in a cookie
+
+                    setcookie("remaining_time", $remainingTime, $cookieExpiration, "/");
+
+
+                    header("location: /product/list");
+                }
             } else {
                 // Display an error message if password is not valid
-                $_SESSION["message"] = "login fail";
+                if (isset($_SESSION['password_error'])) {
+                    //không làm gì cả
+                } else {
+                    $_SESSION['password_error'] = 'bạn nhập sai password mất rồi';
+                    $_SESSION["message"] = "sai password mất rồi";
+                }
+
                 header("location: /login_get");
 
                 //  echo "The password you entered was not valid.";
             }
         } else {
-            $_SESSION["message"] = "login fail";
+
+
+
+            if (isset($_SESSION['email_error'])) {
+                //không làm gì cả
+            } else {
+
+                $_SESSION['email_error'] = 'bạn nhập sai email mất rồi';
+                $_SESSION["message"] = "sai email mất rồi";
+            }
+
+
             header('Location:/login_get');
             // Display an error message if email doesn't exist
             echo "No account found with that email.";
         }
+    }
 
 
-        // ajax show 
+
+    public function handle_data_login($user)
+    {
+        session_start();
+        try {
+            if (!isset($user['email']) || empty($user['email'])) {
+                $_SESSION['email_error'] = 'email trống.';
+
+                throw new Exception(' Bad Request: email trống.');
+            }
+
+            if (!filter_var($user['email'], FILTER_VALIDATE_EMAIL)) {
+                $_SESSION['email_error'] = 'Bad Request: đây không phải là email.';
+
+                throw new Exception(' Bad Request: đây không phải là email.');
+            }
+            if (!array_key_exists('password', $user) || empty($user['password'])) {
+
+                $_SESSION['password_error'] = 'Mậc khẩu trống.';
+
+                throw new Exception(' Bad Request: Mậc khẩu trống.');
+            }
+            if (strlen($user['password']) > 20) {
+
+                $_SESSION['password_error'] = 'Mật khẩu không được quá 20 ký tự.';
+
+                throw new Exception(' Bad Request: Mật khẩu không được quá 20 ký tự.');
+            }
+            // Rest of your code...
+        } catch (Exception $ex) {
+
+            //exceoption được run hoặc là dính lỗi hàm không tồn tại ,cú pháp thì nó vẩn chyaj exception
+            echo $ex->getMessage(); // lấy thông tin từ exceptio("chuổi abc") -> ném chuổi này ra
+            //  echo $ex->getFile();
+            // echo $ex->getLine();
+            http_response_code(400);
+            // echo '<script>alert("' . $ex->getMessage() . '");</script>';
+            // echo '<script>window.location.replace("login_get");</script>'; // Chuyển hướng đến trang khác nếu cần
+            // echo "co loi";
+            //exit(); // Dừng việc thực thi tiếp theo
+
+        }
     }
 
     public function getProductById($id)
