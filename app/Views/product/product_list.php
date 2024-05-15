@@ -1,3 +1,7 @@
+<?php
+//session_start();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -22,12 +26,87 @@
 
 
 <body>
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+
+        <a class="navbar-brand" href="<?= BASE_PATH ?>/">Trang Chủ</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+
+            <ul class="navbar-nav mr-auto">
+
+                <li class="nav-item">
+                    <a class="nav-link" href="/cart">Giỏ hàng</a>
+                </li>
+
+
+                <li class="nav-item">
+
+                    <?php
+                    if (isset($_SESSION['admin']) && $_SESSION['admin'] == true) {
+                        echo '<a class="nav-link" href="/editPhone">Chỉnh sữa loại iphone</a>';
+                    }
+                    ?>
+                </li>
+
+                <li class="nav-item">
+
+                    <?php
+                    if (isset($_SESSION['admin']) && $_SESSION['admin'] == true) {
+                        echo '<a class="nav-link" href="/createProduct">Tạo sản phẩm</a>';
+                    }
+                    ?>
+                </li>
+
+
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        các loại iphone
+                    </a>
+                    <div class="dropdown-menu m-0 bg-secondary rounded-0" aria-labelledby="navbarDropdown">
+                        <?php
+                        foreach ($brands as $brand) {
+                        ?>
+                            <a class="dropdown-item" href="<?= "brand/" . $brand['id'] ?>"><?= $brand['name'] ?></a> <?php } ?>
+                    </div>
+                </li>
+            </ul>
+            <form action="/product/list/search" method="get" class="form-inline my-2 my-lg-0 ml-auto">
+                <input class="form-control mr-sm-2" type="search" placeholder="Tìm kiếm sách" aria-label="Search" name="query">
+                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Tìm kiếm</button>
+            </form>
+        </div>
+    </nav>
+
+
+
+
     <header class="" style="margin-top: 100px;">
 
     </header>
 
     <div class="container">
-        <img src="/image/tiki.png" alt="Banner Quảng cáo Shop Sách! 1" style="width:100%;">
+        <h1 style="color:red">
+
+            <?php
+            if (isset($_SESSION['warning'])) {
+                echo $_SESSION['warning'];
+                unset($_SESSION['warning']);
+            }
+            if (isset($_SESSION['errorMessage'])) {
+                echo $_SESSION['errorMessage'];
+                unset($_SESSION['errorMessage']);
+            }
+            ?>
+
+        </h1>
+
+
+        <img src="/image/tike.jpg" alt="Banner Quảng cáo Shop Sách! 1" style="width:100%;height: 300px;">
 
         <li class="nav-item">
             <a class="nav-link" href="<?= BASE_PATH ?>/logout_post">Đăng xuất</a>
@@ -38,20 +117,36 @@
                 <div class="col-md-4">
                     <div class="card mb-4 shadow-sm">
                         <?php
-                        $bookId = $product['id_book'];
-                        $product1 = $product['hinh'];
-                        echo "<img src=\"/image/{$product1}\" alt=\"\" class=\"card-img-top img-thumbnail img-fluid\" width=\"200\" height=\"200\">";
+                        //echo "<img src=\"/image/iphone13.jpg\" alt=\"\" class=\"card-img-top img-thumbnail img-fluid\" width=\"200\" height=\"200\">";
+
+                        // echo $product['image'];
+
+                        echo "<img src=\"/{$product['image']}\" alt=\"\" class=\"card-img-top img-thumbnail img-fluid\" width=\"200\" height=\"200\">";
                         ?>
+
                         <div class="card-body">
-                            <h5 class="card-title"><?= $product['bookname'] ?></h5>
-                            <p class="card-text"><?= $product['mota'] ?></p>
+                            <h5 class="card-title"><?= $product['brand_name'] ?></h5>
                             <div class="d-flex justify-content-between align-items-center">
+                                <h1 class="text-muted"><?= $product['name'] ?></h1>
+
                                 <div class="btn-group">
-                                    <a href="list/view/<?= $bookId ?>" class="btn btn-sm btn-outline-secondary">View</a>
-                                    <a href="list/form_editProduct/<?= $bookId ?>" class="btn btn-sm btn-outline-secondary">Edit</a>
-                                    <a href="list/delete/<?= $bookId ?>" class="btn btn-sm btn-outline-secondary">Delete</a>
+                                    <a href="view/<?= $product['id'] ?>" class="btn btn-sm btn-outline-secondary">View</a>
+                                    <?php
+
+                                    if (isset($_SESSION['admin']) && $_SESSION['admin'] == true) {
+                                        echo '<a href="form_editProduct/' . $product['id'] . '" class="btn btn-sm btn-outline-secondary">Edit</a>';
+                                    }
+                                    ?>
+
+                                    <li class="nav-item">
+                                        <?php
+                                        if (isset($_SESSION['admin']) && $_SESSION['admin'] == true) {
+                                            echo '<a href="delete/' . $product['id'] . '" class="btn btn-sm btn-outline-secondary">Delete</a>';
+                                        }
+                                        ?>
+                                    </li>
                                 </div>
-                                <small class="text-muted"><?= $product['price'] ?></small>
+                                <h1 class="text-muted"><?= $product['price'] ?></h1>
                             </div>
                         </div>
                     </div>

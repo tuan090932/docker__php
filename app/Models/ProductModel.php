@@ -2,108 +2,113 @@
 
 namespace App\Models;
 
-
+use App\Models\BrandModel;
 use Exception;
-// tự hiểu auto_load sẽ add vào
+
 class ProductModel extends BaseModel
 {
+    private $brandModel;
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->brandModel = new BrandModel();
+    }
 
     public function getAllProducts()
     {
         try {
-
-            //  $this->query("SHOW TABLES");
-            // return $this->resultSet();
-
-            //$this->db->query("SHOW TABLES");
-
-            $this->db->query("SELECT * FROM book");
-            // $this->log("Getting all products from " . __FILE__);
-            //-> output là  file này "C:\xampp\htdocs\PHP_MVC\app\Models\ProductModel.php"
+            $this->db->query("SELECT product.*, brand.name as brand_name FROM product JOIN brand ON product.brand_id = brand.id");
             return $this->db->resultSet();
         } catch (Exception $e) {
-            // Xử lý lỗi ở đây
-            // $this->log("Caught exception: " . $e->getMessage());
             echo 'Caught exception: ',  $e->getMessage(), "\n";
         }
     }
+
     public function getProductById($id)
     {
-        $this->db->query("SELECT * FROM book WHERE id_book = :id");
+        $this->db->query("SELECT * FROM product WHERE id = :id");
         $this->db->bind(':id', $id);
-        return $this->db->single();
+        $product = $this->db->single();
+
+        if (!$product) {
+            $_SESSION['errorMessage'] = 'Sản phẩm đã bị xóa';
+            header('Location: /');
+            exit();
+        }
+
+        return $product;
     }
 
+    public function getProductByBrand($brandId)
+    {
+        $this->db->query("SELECT * FROM product WHERE brand_id = :brand_id");
+        $this->db->bind(':brand_id', $brandId);
+        return $this->db->resultSet();
+    }
 
     public function createProduct($productData)
     {
         $this->db->query("INSERT INTO book (bookname, mota) VALUES(:bookname, :mota)");
-        // Bind values
         $this->db->bind(':bookname', $productData['bookname']);
         $this->db->bind(':mota', $productData['mota']);
-        // Get current date and time
-        // $now = new \DateTime();
-        // $this->db->bind(':created_at', $now->format('Y-m-d H:i:s'));
-        // $this->db->bind(':updated_at', $now->format('Y-m-d H:i:s'));
-        // Execute
-        if ($this->db->execute()) {
-            echo "<script>alert('create thành công');</script>";
 
+        if ($this->db->execute()) {
             return true;
         } else {
             return false;
         }
     }
+
     public function deleteProduct($id)
     {
-        $this->db->query("DELETE FROM book WHERE id_book = :id");
-        // Bind values
+        $this->db->query("DELETE FROM product WHERE id = :id");
         $this->db->bind(':id', $id);
-        // Execute  
-        if ($this->db->execute()) {
-            echo "<script>alert('delete thành công');</script>";
 
+        if ($this->db->execute()) {
             return true;
         } else {
             return false;
         }
     }
 
-
-    public function productSearch()
+    public function productSearch($query)
     {
-        if (isset($_GET['query'])) {
-            echo $_GET['query'];
-        }
-    }
-
-    public function searchProduct($query)
-    {
-
-
         $this->db->query("SELECT * FROM book WHERE bookname LIKE :query");
         $this->db->bind(':query', '%' . $query . '%');
         $results = $this->db->resultSet();
         return $results;
     }
 
-    public function editProduct($id, $productData)
+    public function createProductImage($productData)
     {
+        $brandId = $this->brandModel->getBrandByName($productData['brand_name']);
 
-
-        $this->db->query("UPDATE book SET bookname = :bookname, mota = :mota ,hinh=:hinh,rating=:rating,nxb=:nxb,author=:author,price=:price,id_danhmuc=:id_danhmuc WHERE id_book = :id");
-        $this->db->bind(':id', $id);
-        $this->db->bind(':bookname', $productData['bookname']);
-        $this->db->bind(':mota', $productData['mota']);
-        $this->db->bind(':hinh', $productData['hinh']);
-        $this->db->bind(':rating', $productData['rating']); // Add this line
-        $this->db->bind(':nxb', $productData['nxb']);
-        $this->db->bind(':author', $productData['author']);
+        $this->db->query("INSERT INTO product (name, price, image, brand_id) VALUES(:name, :price, :image, :brand_id)");
+        $this->db->bind(':name', $productData['name']);
         $this->db->bind(':price', $productData['price']);
-        $this->db->bind(':id_danhmuc', $productData['id_danhmuc']);
+        $this->db->bind(':image', $productData['image']);
+        $this->db->bind(':brand_id', $brandId['id']);
 
         if ($this->db->execute()) {
-            echo "<script>alert('update thành công');</script>";
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function editProduct($id, $productData)
+    {
+        $brandId = $this->brandModel->getBrandByName($productData['brand_name']);
+
+        $this->db->query("UPDATE product SET name = :name, price = :price, image = :image, brand_id = :brand_id WHERE id = :id");
+        $this->db->bind(':id', $id);
+        $this->db->bind(':name', $productData['name']);
+        $this->db->bind(':price', $productData['price']);
+        $this->db->bind(':image', $productData['image']);
+        $this->db->bind(':brand_id', $brandId['id']);
+
+        if ($this->db->execute()) {
             return true;
         } else {
             return false;

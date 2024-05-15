@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <?php
-session_start();
+//session_start();
 
 ?>
 
@@ -77,7 +77,7 @@ session_start();
                         <span id="error_message" style="color: red;"></span>
                         <p class="mt-3">
                             Not registered?
-                            <a href="register_get">Create an
+                            <a href="register">Create an
                                 account</a>
                         </p>
                         <span> <?php

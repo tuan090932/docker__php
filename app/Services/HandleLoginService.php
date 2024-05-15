@@ -25,6 +25,36 @@ class HandleLoginService extends BaseModel
 
     }
 
+    public function convertURLToFinalValue()
+    {
+
+        // VarDumper::dump("helo");
+        if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on')
+            $url = "https://";
+        else
+            $url = "http://";
+        // Append the host(domain name, ip) to the URL.   
+        $url .= $_SERVER['HTTP_HOST'];
+        //  echo $url;
+        // Append the requested resource location to the URL   
+        $url .= $_SERVER['REQUEST_URI'];
+        // Phân tích URL
+        $urlParts = parse_url($url);
+        //echo $urlParts;
+        //  echo $urlParts;
+        // echo $urlParts['path'];
+
+        $url = $urlParts;
+
+        // Split the path by '/'
+        $pathParts = explode('/', $url['path']);
+
+        // Get the last part of the path, which should be the final value
+        $finalValue = end($pathParts);
+
+        return $finalValue;
+    }
+
     public function checkSession()
     {
         $sessionId = $_COOKIE['session_Id'] ?? null;
@@ -40,7 +70,7 @@ class HandleLoginService extends BaseModel
     }
 
 
-    public function handle_login($User, $remember)
+    public function handleLogin($User, $remember)
     {
 
 
@@ -59,6 +89,13 @@ class HandleLoginService extends BaseModel
         if ($row) {
             // Verify the password
             if (password_verify($User['password'], $row['password'])) {
+
+                if ($row['role'] == 1) {
+                    $_SESSION['admin'] = true;
+                } else {
+                    $_SESSION['admin'] = false;
+                }
+
                 // Password is correct, so start a new session
 
                 // Store data in session variables
@@ -71,14 +108,20 @@ class HandleLoginService extends BaseModel
                 // exit;
 
                 // Insert session_id into session table
-                $this->UserModel->InsertSession($randomNumber);
+                $this->UserModel->insertSession($randomNumber);
                 $_SESSION["address"] = $row['address'];
                 $_SESSION["phone_number"] = $row['phone_number'];
 
                 // If remember me is checked, set cookies
                 if ($remember) {
-                    $cookieExpiration = time() + (86400); // 86400 = 1 day
 
+
+                    //if()
+
+
+
+                    $cookieExpiration = time() + (86400); // 86400 = 1 day
+                    setcookie("user_id",  $row['id'], $cookieExpiration, "/");
                     setcookie("email",  $row['email_address'], $cookieExpiration, "/");
                     setcookie("username", $row['username'], $cookieExpiration, "/");
                     setcookie("remember", $remember, $cookieExpiration, "/");
@@ -88,7 +131,7 @@ class HandleLoginService extends BaseModel
                     $remainingTime = $cookieExpiration - time();
                     // Store the remaining time in a cookie
                     setcookie("remaining_time", $remainingTime, $cookieExpiration, "/");
-                    header("location: /product/list");
+                    header("location: /");
                 }
                 // If remember me is not checked, dele  te cookies
 
@@ -107,7 +150,7 @@ class HandleLoginService extends BaseModel
                     setcookie("remaining_time", $remainingTime, $cookieExpiration, "/");
 
 
-                    header("location: /product/list");
+                    header("location: /");
                 }
             } else {
                 // Display an error message if password is not valid
@@ -118,7 +161,7 @@ class HandleLoginService extends BaseModel
                     $_SESSION["message"] = "sai password mất rồi";
                 }
 
-                header("location: /login_get");
+                header("location: /login");
 
                 //  echo "The password you entered was not valid.";
             }
@@ -143,7 +186,7 @@ class HandleLoginService extends BaseModel
 
 
 
-    public function handle_data_login($user)
+    public function handleDataLogin($user)
     {
         session_start();
         try {
@@ -186,9 +229,6 @@ class HandleLoginService extends BaseModel
         }
     }
 
-    public function getProductById($id)
-    {
-        //  return $this->productModel->getProductById($id);
-    }
+
     // Add more methods as needed for other product-related logic
 }

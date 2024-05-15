@@ -1,3 +1,8 @@
+<?php
+session_start();
+?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -13,83 +18,89 @@
     <header class="mb-4">
         <h1 class="text-center">Tạo Sản Phẩm Mới</h1>
     </header>
-    <?php
-    //include "../app/Views/components/header.php";
-    ?>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
 
+        <a class="navbar-brand" href="/">Trang Chủ</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+
+            <ul class="navbar-nav mr-auto">
+
+                <li class="nav-item">
+                    <a class="nav-link" href="/cart">Giỏ hàng</a>
+                </li>
+                <li class="nav-item">
+
+                    <?php
+                    if (isset($_SESSION['admin']) && $_SESSION['admin'] == true) {
+                        echo '<a class="nav-link" href="/editPhone">Chỉnh sữa loại iphone</a>';
+                    }
+                    ?>
+                </li>
+            </ul>
+
+        </div>
+    </nav>
     <main class="container">
         <form action="<?= BASE_PATH ?>/product/edit" method="post" enctype="multipart/form-data">
-            <div class="form-group">
-                <label for="bookname">Title:</label>
-                <input type="text" class="form-control" id="bookname" name="bookname">
-            </div>
 
             <div class="form-group">
-                <label for="mota">Body:</label>
-                <input type="text" class="form-control" id="mota" name="mota">
+                <label for="name">Name:</label>
+                <input type="text" class="form-control" id="name" name="name">
             </div>
 
             <div class="form-group">
-                <label for="Rating">Rating:</label>
-                <input type="number" class="form-control" id="Rating" name="Rating">
+                <label for="price">Price:</label>
+                <input type="text" class="form-control" id="price" name="price">
+            </div>
+
+
+
+            <div class="form-group">
+                <label for="image">Image:</label>
+                <input type="file" class="form-control-file" id="image" name="image">
+                <img src="" class="card-img-top" alt="Preview" style="width: 200px; height: 200px; display: none;">
             </div>
 
             <div class="form-group">
-                <label for="Publisher">Publisher:</label>
-                <input type="text" class="form-control" id="Publisher" name="Publisher">
+                <label for="brand_name">Brand:</label>
+                <select class="form-control" id="brand_name" name="brand_name">
+                    <?php foreach ($Brand as $product) : ?>
+                        <option value="<?= $product['name'] ?>"> <?= $product['name'] ?></option>
+                    <?php endforeach; ?>
+                </select>
             </div>
-
-            <div class="form-group">
-                <label for="Author">Author:</label>
-                <input type="text" class="form-control" id="Author" name="Author">
-            </div>
-
-            <div class="form-group">
-                <label for="Price">Price:</label>
-                <input type="number" class="form-control" id="Price" name="Price">
-            </div>
-
-            <div class="form-group">
-                <label for="Category_Id">Category Id:</label>
-                <input type="number" class="form-control" id="Category_Id" name="Category_Id">
-            </div>
-
-
-
-
-            <div class="row mb-2">
-                <label>Hình ảnh</label>
-                <br>
-                <img src="../image/<?= $book['hinh'] ?>" class="card-img-top" alt="..." style="width: 200px; height: 200px;">
-                <input type="file" name="hinh" class="mr-1 col-5" value="<?= $book['hinh'] ?>">
-            </div>
-
 
             <input type="hidden" name="id" value="<?= $finalValue ?>">
-            <button type="submit" class="btn btn-primary">Tạo Sản Phẩm</button>
+            <button type="submit" class="btn btn-primary">Create Product</button>
         </form>
     </main>
+
     <footer class="footer mt-auto py-3 bg-light text-center">
         <div class="container">
             &copy; 2023 BHZ Co.
         </div>
     </footer>
+
+    <?php
+    //require_once "components/footer.php";
+    include "../app/Views/components/footer.php";
+    ?>
+
+    <script>
+        document.querySelector('input[type="file"]').addEventListener('change', function(e) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var previewImage = document.querySelector('img.card-img-top');
+                previewImage.src = e.target.result;
+                previewImage.style.display = 'block';
+            }
+            reader.readAsDataURL(this.files[0]);
+        });
+    </script>
 </body>
 
-<?php
-//require_once "components/footer.php";
-include "../app/Views/components/footer.php";
-?>
-
 </html>
-
-
-<script>
-    document.querySelector('input[type="file"]').addEventListener('change', function(e) {
-        var reader = new FileReader();
-        reader.onload = function(e) {
-            document.querySelector('img.card-img-top').src = e.target.result;
-        }
-        reader.readAsDataURL(this.files[0]);
-    });
-</script>

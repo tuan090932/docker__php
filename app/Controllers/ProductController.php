@@ -3,50 +3,46 @@
 namespace App\Controllers;
 
 use App\Models\ProductModel;
-use App\Validators\FormValidator;
-use Symfony\Component\VarDumper\VarDumper;
-use function App\Controllers\view;
-use Exception;
-
-
-
-namespace App\Controllers;
-
-use App\Models\ProductModel;
-use App\Services\HandleLoginService;
-
+use App\Models\BrandModel;
 use App\Models\UserModel;
-
-
-
-
+use App\Models\CartModel;
+use App\Services\HandleLoginService;
+use Symfony\Component\VarDumper\VarDumper;
+use Exception;
 
 class ProductController extends BaseController
 {
     private $productModel;
-    private $HandleLoginService;
+    private $cartModel;
 
-    private $UserModel;
+
+    private $handleLoginService;
+    private $userModel;
+    private $brandModel;
+
     public function __construct()
     {
         parent::__construct();
-        $this->HandleLoginService = new HandleLoginService();
+        $this->handleLoginService = new HandleLoginService();
         $this->productModel = new ProductModel();
-        $this->UserModel = new UserModel();
+        $this->userModel = new UserModel();
+        $this->brandModel = new BrandModel();
+        $this->cartModel = new CartModel();
     }
 
     public function productList()
     {
-        //VarDumper::dump("helo");
 
-        if ($this->HandleLoginService->checkSession()) {
+        if ($this->handleLoginService->checkSession()) {
             $products = $this->productModel->getAllProducts();
-            //$data = compact('products');
+            $brands = $this->brandModel->getAllBrand();
+            // require_once '../app/Views/product/product_list.php';
             require_once '../app/Views/product/product_list.php';
         } else {
             header('Location:/login_get');
             exit();
         }
+
 
         //    try {
         //       if (isset($_COOKIE['username'])) {
@@ -62,36 +58,87 @@ class ProductController extends BaseController
 
     public function createProduct()
     {
-        require_once '../app/Views/create_product.php';
+
+        //session_start();
+        if ($_SESSION['admin'] == true) {
+            $Brand = $this->brandModel->getAllBrand();
+            require_once '../app/Views/product/create_product.php';
+        } else {
+            $_SESSION['warning'] = "bạn không có quyền truy cập vào trang này ";
+            header('Location:/');
+        }
     }
-
-
-    public function handle_createProduct()
+    public function handleCreateProduct()
     {
 
-        if ($_SERVER["REQUEST_METHOD"] == "POST") {
-            $validator = new FormValidator($_POST);
-            try {
-                // $validator->validate();
-                //echo $_POST['title'];
-                // exit();
-
-                $productData = [
-                    'bookname' => $_POST['bookname'],
-                    'mota' => $_POST['mota'],
-                ];
 
 
-                $this->productModel->createProduct($productData);
-                header('Location: /product/list');
-                exit();
-            } catch (Exception $e) {
-                echo $e->getMessage();
+
+        if (isset($_POST['id'])) {
+            $name = $_POST['name'];
+            $price = $_POST['price'];
+            $brand_name = $_POST['brand_name'];
+
+            // Handle file upload
+            $image = null;
+            if (isset($_FILES['image'])) {
+                $target_dir = "./image/";
+                if (!is_dir($target_dir)) {
+                    echo "Directory does not exist: $target_dir";
+                } elseif (!is_writable($target_dir)) {
+                    echo "Directory is not writable: $target_dir";
+                } else {
+                    $target_file = $target_dir . basename($_FILES["image"]["name"]);
+                    if (move_uploaded_file($_FILES["image"]["tmp_name"], $target_file)) {
+                        $image = $target_file;
+                        echo "Upload successful";
+                    } else {
+                        echo "Sorry, there was an error uploading your file.";
+                    }
+                }
             }
+            $product = [
+                'name' => $name,
+                'price' => $price,
+                'image' => $image,
+                'brand_name' => $brand_name,
+            ];
+
+            $this->productModel->createProductImage($product);
         }
     }
 
-    public function form_editProduct()
+    public function handleFilterByBrand()
+    {
+        //output tất cả product với brand_id
+
+        if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on')
+            $url = "https://";
+        else
+            $url = "http://";
+        $url .= $_SERVER['HTTP_HOST'];
+        $url .= $_SERVER['REQUEST_URI'];
+        $urlParts = parse_url($url);
+        $url = $urlParts;
+
+        // Split the path by '/'
+        $pathParts = explode('/', $url['path']);
+        // Get the last part of the path, which should be the final value
+        $finalValue = end($pathParts);
+        //echo $finalValue;
+        $products = $this->productModel->getProductByBrand($finalValue);
+        //$products = $this->productModel->getProductByBrand()
+
+        require_once '../app/Views/product/showProduct.php';
+
+        // $Brand = $this->BrandModel->getAllBrand();
+        //  exit;
+        // Render view with the filtered products
+    }
+
+
+
+    public function productListByIdGet()
     {
         if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on')
             $url = "https://";
@@ -104,27 +151,58 @@ class ProductController extends BaseController
 
         // Split the path by '/'
         $pathParts = explode('/', $url['path']);
-
         // Get the last part of the path, which should be the final value
-
-
         $finalValue = end($pathParts);
 
-        // echo $finalValue;
+        $product = $this->productModel->getProductById($finalValue);
+        require_once '../app/Views/product/view_Product.php';
 
-        //compact($finalValue);
-        //require_once, các biến hiện tại được sử dụng trong phạm vi hàm gọi đó sẽ có thể truy cập được trong tệp tin được gọi
-        // -> finalValue được gọi vì dùng require_onmce
-        require_once '../app/Views/product/editProduct.php';
+        //input id-> output 1 product
+    }
+
+    public function formEditProduct()
+    {
+
+
+
+        session_start();
+        // Tách tên tệp từ đường dẫn đến tệp
+        if ($_SESSION['admin'] == true) {
+
+            if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on')
+                $url = "https://";
+            else
+                $url = "http://";
+            $url .= $_SERVER['HTTP_HOST'];
+            $url .= $_SERVER['REQUEST_URI'];
+            $urlParts = parse_url($url);
+            $url = $urlParts;
+
+            // Split the path by '/'
+            $pathParts = explode('/', $url['path']);
+            // Get the last part of the path, which should be the final value
+            $finalValue = end($pathParts);
+            $Brand = $this->brandModel->getAllBrand();
+            //$products = $this->productModel->getAllProducts();
+
+            // echo $finalValue;
+            //compact($finalValue);
+            //require_once, các biến hiện tại được sử dụng trong phạm vi hàm gọi đó sẽ có thể truy cập được trong tệp tin được gọi
+            // -> finalValue được gọi vì dùng require_onmce
+            require_once '../app/Views/product/editProduct.php';
+        } else {
+            $_SESSION['warning'] = "bạn không có quyền truy cập vào trang này ";
+            header('Location:/');
+        }
     }
 
     public function productSearch()
     {
         if (isset($_GET['query'])) {
             echo $_GET['query'];
-            $products = $this->productModel->searchProduct($_GET['query']);
+            //  $products = $this->productModel->searchProduct($_GET['query']);
+            $products = $this->productModel->productSearch($_GET['query']);
             //echo $products;
-
             // $data = compact('products');
 
             require_once '../app/Views/product/showProduct.php';
@@ -133,28 +211,40 @@ class ProductController extends BaseController
         }
     }
 
-
-
-    public function handle_deleteProduct()
+    public function handleDeleteProduct()
     {
-        if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on')
-            $url = "https://";
-        else
-            $url = "http://";
-        $url .= $_SERVER['HTTP_HOST'];
-        $url .= $_SERVER['REQUEST_URI'];
-        $urlParts = parse_url($url);
-        $url = $urlParts;
+        // Tách tên tệp từ đường dẫn đến tệp
+        if ($_SESSION['admin'] == true) {
 
-        // Split the path by '/'
-        $pathParts = explode('/', $url['path']);
 
-        // Get the last part of the path, which should be the final value
-        $finalValue = end($pathParts);
+            if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on')
+                $url = "https://";
+            else
+                $url = "http://";
+            $url .= $_SERVER['HTTP_HOST'];
+            $url .= $_SERVER['REQUEST_URI'];
+            $urlParts = parse_url($url);
+            $url = $urlParts;
+            // Split the path by '/'
+            $pathParts = explode('/', $url['path']);
+            // Get the last part of the path, which should be the final value
+            $finalValue = end($pathParts);
+            echo $finalValue;
 
-        echo $finalValue;
 
-        $product = $this->productModel->deleteProduct($finalValue);
+            // Delete or update rows in the cart table that reference the product
+
+            // Now you can delete the product
+            //$this->productModel->deleteProduct($id);
+
+            $this->cartModel->deleteCartById($finalValue);
+
+
+            $product = $this->productModel->deleteProduct($finalValue);
+        } else {
+            $_SESSION['warning'] = "bạn không có quyền truy cập vào trang này ";
+            header('Location:/');
+        }
     }
 
     function extractFileName($path)
@@ -165,69 +255,104 @@ class ProductController extends BaseController
         // Trả về tên tệp đã xử lý
         return $filename;
     }
-    public function handle_edit()
+
+    function getAllBrand()
+    {
+
+        session_start();
+        // Tách tên tệp từ đường dẫn đến tệp
+        if ($_SESSION['admin'] == true) {
+            $brand =  $this->brandModel->getAllBrand();
+            echo "hello";
+            require_once '../app/Views/product/showBrand.php';
+        } else {
+            $_SESSION['warning'] = "bạn không có quyền truy cập vào trang này ";
+            header('Location:/');
+        }
+
+        // Trả về tên tệp đã xử lý
+    }
+
+    function getAddBrand($id_brand)
+    {
+        // Tách tên tệp từ đường dẫn đến tệp
+        $brand =  $this->brandModel->getAllBrand();
+        require_once '../app/Views/product/showBrand.php';
+
+        // Trả về tên tệp đã xử lý
+    }
+
+    function postAddBrand($id_brand)
+    {
+        // Tách tên tệp từ đường dẫn đến tệp
+        $brand =  $this->brandModel->getAllBrand();
+        require_once '../app/Views/product/showBrand.php';
+
+        // Trả về tên tệp đã xử lý
+    }
+
+    public function handleEdit()
     {
         if (isset($_POST['id'])) {
-            $bookname = $_POST['bookname'];
-            $mota = $_POST['mota'];
-            $rating = $_POST['Rating'];
+            $name = $_POST['name'];
+            $price = $_POST['price'];
+            $brand_name = $_POST['brand_name'];
 
-            $nxb = $_POST['Publisher'];
-
-            $author = $_POST['Author'];
-
-            $id_danhmuc = $_POST['Category_Id'];
-
-            $price = $_POST['Price'];
-            //tiếp tục code lấy giá trị từ sau khi upload xuống 
-            // Check if file was uploaded
-            //$_POST['hinh'] = $_FILES['hinh']['name'];
-            if (isset($_FILES['hinh'])) {
+            // Handle file upload
+            $image = null;
+            if (isset($_FILES['image'])) {
                 $target_dir = "./image/";
                 if (!is_dir($target_dir)) {
                     echo "Directory does not exist: $target_dir";
                 } elseif (!is_writable($target_dir)) {
                     echo "Directory is not writable: $target_dir";
                 } else {
-                    $target_file = $target_dir . basename($_FILES["hinh"]["name"]);
-                    if (move_uploaded_file($_FILES["hinh"]["tmp_name"], $target_file)) {
-                        $hinh = $target_file;
-                        echo $hinh;
-                        // chèn cái này = cái lúc đầu ->output nó là  ./image/Screenshot 2024-03-06 232352.png
-                        echo "thanh công";
+                    $target_file = $target_dir . basename($_FILES["image"]["name"]);
+                    if (move_uploaded_file($_FILES["image"]["tmp_name"], $target_file)) {
+                        $image = $target_file;
+                        echo "Upload successful";
                     } else {
                         echo "Sorry, there was an error uploading your file.";
                     }
                 }
             }
 
-            echo $hinh;
-
-            $hinh = $this->extractFileName($hinh);
-            // echo $hinh;
-
             $product = [
-                'bookname' => $bookname,
-                'mota' => $mota,
-                'hinh' => $hinh,
-                'rating' => $rating,
-                'nxb' => $nxb,
-                'author' => $author,
+                'name' => $name,
                 'price' => $price,
-                'id_danhmuc' => $id_danhmuc
+                'image' => $image,
+                'brand_name' => $brand_name,
             ];
+
             $this->productModel->editProduct($_POST['id'], $product);
         }
     }
 
+    public function handlePostBrand()
+    {
+        session_start(); // PHẢI KHAI BÁO NÓ TRƯỚC KHI SỬ DỤNG
+
+        if (isset($_POST['nameBrand'])) {
+            $this->brandModel->createBrand($_POST['nameBrand']);
+        }
+    }
 
 
-
-
-
-    public function handle_viewProduct()
+    public function handleDeleteBrandByID()
     {
 
+        session_start();
+
+        $idBrand = $this->handleLoginService->convertURLToFinalValue();
+        // exit;
+        //session_start(); // PHẢI KHAI BÁO NÓ TRƯỚC KHI SỬ DỤNG
+
+        $this->brandModel->deleteBrandById($idBrand);
+    }
+
+
+    public function handleViewProduct()
+    {
         // VarDumper::dump("helo");
         if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on')
             $url = "https://";
@@ -253,7 +378,6 @@ class ProductController extends BaseController
         $finalValue = end($pathParts);
 
         echo $finalValue;
-
 
         $product = $this->productModel->getProductById($finalValue);
         echo "<script>alert('Title: " . $product['bookname'] . "\\nBody: " . $product['author'] . "');</script>";

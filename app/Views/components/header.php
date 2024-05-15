@@ -25,10 +25,12 @@
                     các loại iphone
                 </a>
                 <div class="dropdown-menu m-0 bg-secondary rounded-0" aria-labelledby="navbarDropdown">
-                    <a class="dropdown-item" href="<?= BASE_PATH ?>/product/iphone12">iPhone 12</a>
-                    <a class="dropdown-item" href="<?= BASE_PATH ?>/product/iphone11">iPhone 11</a>
-                    <a class="dropdown-item" href="<?= BASE_PATH ?>/product/iphoneSE">iPhone SE</a>
-                    <!-- Add more models as needed -->
+                    <?php
+                    foreach ($brands as $item) {
+                        $url = BASE_PATH . "/product/" . strtolower($item['name']);
+                    ?>
+                        <a class="dropdown-item" href="<?= $url ?>"><?= $item['name'] ?></a>
+                    <?php } ?>
                 </div>
             </li>
         </ul>

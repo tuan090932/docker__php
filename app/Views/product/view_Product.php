@@ -2,6 +2,7 @@
 session_start();
 ?>
 
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -17,8 +18,6 @@ session_start();
 
 <body>
 
-
-
     <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
 
         <a class="navbar-brand" href="/">Trang Chủ</a>
@@ -33,7 +32,6 @@ session_start();
                 <li class="nav-item">
                     <a class="nav-link" href="/cart">Giỏ hàng</a>
                 </li>
-
                 <li class="nav-item">
 
                     <?php
@@ -49,50 +47,28 @@ session_start();
     </nav>
 
 
-
     <header class="" style="margin-top: 100px;">
 
     </header>
 
-
-
-
     <div class="container">
-        <img src="/image/tiki.png" alt="Banner Quảng cáo Shop Sách! 1" style="width:100%;">
+        <div class="product">
+            <h2><?php echo $product['name']; ?></h2>
+            <p>Price: <?php echo $product['price']; ?></p>
+            <?php
+            echo "<img src=\"/{$product['image']}\" alt=\"\" class=\"card-img-top img-thumbnail img-fluid\" style=\"width: 300px; height: 300px;\">";
+            ?>
 
-        <li class="nav-item">
-            <a class="nav-link" href="<?= BASE_PATH ?>/logout_post">Đăng xuất</a>
-        </li>
+            <form action="post_cart" method="post">
+                <input type="hidden" name="product_id" value="<?= $product['id'] ?>">
+                <input type="hidden" name="user_id" value="<?= $_COOKIE['user_id'] ?>">
+                <button type="submit" class="btn btn-primary">Lưu vào giỏ hàng</button>
+            </form>
 
-        <div class="row">
-            <?php foreach ($products as $product) { ?>
-                <div class="col-md-4">
-                    <div class="card mb-4 shadow-sm">
-                        <?php
-                        //echo "<img src=\"/image/iphone13.jpg\" alt=\"\" class=\"card-img-top img-thumbnail img-fluid\" width=\"200\" height=\"200\">";
-
-                        echo $product['price'];
-                        echo $product['name'];
-
-                        // echo $product['image'];
-
-                        //echo $product['image'];
-                        echo "<img src=\"/{$product['image']}\" alt=\"\" class=\"card-img-top img-thumbnail img-fluid\" width=\"200\" height=\"200\">";
-                        ?>
-
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <h1 class="text-muted"><?= $product['name'] ?></h1>
-
-
-                                <h1 class="text-muted"><?= $product['price'] ?></h1>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            <?php } ?>
         </div>
     </div>
+
+
     <footer class="footer mt-auto py-3 bg-light text-center">
         <div class="container">
             <span class="text-muted">&copy; 2023 BHZ Co.</span>

@@ -20,8 +20,23 @@ use App\Routing\Route;
 //Route::add('/index', 'HomeController@index');
 //echo "<pre>" . print_r(Route::showroutes()) . "</pre>";
 
-Route::add('/product/list', 'ProductController@productList');
+//Route::add('/product/list', 'ProductController@productList');
+Route::add('/', 'ProductController@productList');
+Route::add('/view/(\d+)', 'ProductController@productListByIdGet');
+Route::add('/cart', 'CartController@getAllCart');
 
+
+
+
+
+Route::add('/view/post_cart', 'CartController@handlePostCart');
+Route::add('/editPhone', 'ProductController@getAllBrand');
+Route::add('/addBrand', 'ProductController@getAllBrand');
+Route::add('/deleteBrandByID/(\d+)', 'ProductController@handleDeleteBrandByID');
+
+
+
+Route::add('/postBrand', 'ProductController@handlePostBrand');
 
 
 
@@ -48,25 +63,29 @@ Route::add('/product/list', 'ProductController@productList');
 
 // i want add edit -> give me route edit
 
-Route::add('/product/list/view/(\d+)', 'ProductController@handle_viewProduct');
-Route::add('/product/list/delete/(\d+)', 'ProductController@handle_deleteProduct');
-Route::add('/product/list/form_editProduct/(\d+)', 'ProductController@form_editProduct');
-Route::add('/product/edit', 'ProductController@handle_edit');
+Route::add('/createProduct', 'ProductController@createProduct');
+Route::add('/handleCreateProduct', 'ProductController@handleCreateProduct');
+
+Route::add('/brand/(\w+)', 'ProductController@handleFilterByBrand');
+Route::add('/product/list/view/(\d+)', 'ProductController@handleViewProduct');
+Route::add('/delete/(\d+)', 'ProductController@handleDeleteProduct');
+Route::add('/form_editProduct/(\d+)', 'ProductController@formEditProduct');
+Route::add('/product/edit', 'ProductController@handleEdit');
 Route::add('/product/list/search', 'ProductController@productSearch');
 
 
-Route::add('/check_login_ajax', 'AuthController@check_login_ajax');
+//Route::add('/check_login_ajax', 'AuthController@check_login_ajax');
 
 
 
 //Route::add('/product/search', 'ProductController@productSearch');
 
-Route::add('/login_get', 'AuthController@login_get');
-Route::add('/login_post', 'AuthController@login_post');
-Route::add('/register_get', 'AuthController@register_get');
-Route::add('/register_post', 'AuthController@register_post');
+Route::add('/login', 'AuthController@getLogin');
+Route::add('/login_post', 'AuthController@postLogin');
+Route::add('/register', 'AuthController@getRegister');
+Route::add('/register_post', 'AuthController@postRegister');
 
-Route::add('/logout_post', 'AuthController@logout_post');
+Route::add('/logout_post', 'AuthController@postLogout');
 
 //Route::add('/product/detail/(\d+)', 'ProductController@productdetail');
 //$router->add('/product/list', ['controller' => 'ProductController', 'action' => 'productList']);
