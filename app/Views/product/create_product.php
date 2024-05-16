@@ -40,6 +40,13 @@ session_start();
                     }
                     ?>
                 </li>
+
+                <h1 style="color:red"><?php
+                                        if (isset($_SESSION['statusCreateProduct'])) {
+                                            echo $_SESSION['statusCreateProduct'];
+                                            unset($_SESSION['statusCreateProduct']);
+                                        }
+                                        ?></h1>
             </ul>
 
         </div>

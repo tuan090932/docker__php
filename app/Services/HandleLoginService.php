@@ -86,6 +86,9 @@ class HandleLoginService extends BaseModel
         $row = $this->db->single();
 
         // Check if the email exists in the database
+
+
+
         if ($row) {
             // Verify the password
             if (password_verify($User['password'], $row['password'])) {
@@ -115,11 +118,7 @@ class HandleLoginService extends BaseModel
                 // If remember me is checked, set cookies
                 if ($remember) {
 
-
                     //if()
-
-
-
                     $cookieExpiration = time() + (86400); // 86400 = 1 day
                     setcookie("user_id",  $row['id'], $cookieExpiration, "/");
                     setcookie("email",  $row['email_address'], $cookieExpiration, "/");
@@ -136,7 +135,9 @@ class HandleLoginService extends BaseModel
                 // If remember me is not checked, dele  te cookies
 
                 if ($remember == false) {
-                    $cookieExpiration = time() + (10); //là số giây là 10 giây // 86400 = 1 day
+                    $cookieExpiration = time() + (2 * 3600); // 2 hours                    setcookie("email",  $row['email_address'], $cookieExpiration, "/");
+
+                    setcookie("user_id",  $row['id'], $cookieExpiration, "/");
                     setcookie("email",  $row['email_address'], $cookieExpiration, "/");
                     setcookie("username", $row['username'], $cookieExpiration, "/");
                     setcookie("remember", '0', $cookieExpiration, "/");
@@ -146,41 +147,19 @@ class HandleLoginService extends BaseModel
                     // Calculate the remaining time for the cookie to expire
                     $remainingTime = $cookieExpiration - time();
                     // Store the remaining time in a cookie
-
                     setcookie("remaining_time", $remainingTime, $cookieExpiration, "/");
-
-
                     header("location: /");
                 }
             } else {
+                $_SESSION['password_error'] = 'bạn nhập sai password mất rồi';
+                throw new Exception(' bạn nhập sai password mất rồi ');
                 // Display an error message if password is not valid
-                if (isset($_SESSION['password_error'])) {
-                    //không làm gì cả
-                } else {
-                    $_SESSION['password_error'] = 'bạn nhập sai password mất rồi';
-                    $_SESSION["message"] = "sai password mất rồi";
-                }
-
-                header("location: /login");
-
                 //  echo "The password you entered was not valid.";
             }
         } else {
-
-
-
-            if (isset($_SESSION['email_error'])) {
-                //không làm gì cả
-            } else {
-
-                $_SESSION['email_error'] = 'bạn nhập sai email mất rồi';
-                $_SESSION["message"] = "sai email mất rồi";
-            }
-
-
-            header('Location:/login_get');
+            $_SESSION['email_error'] = 'bạn nhập sai email mất rồi';
+            throw new Exception(' bạn nhập sai email mất rồi ');
             // Display an error message if email doesn't exist
-            echo "No account found with that email.";
         }
     }
 
@@ -188,45 +167,45 @@ class HandleLoginService extends BaseModel
 
     public function handleDataLogin($user)
     {
-        session_start();
-        try {
-            if (!isset($user['email']) || empty($user['email'])) {
-                $_SESSION['email_error'] = 'email trống.';
-
-                throw new Exception(' Bad Request: email trống.');
-            }
-
-            if (!filter_var($user['email'], FILTER_VALIDATE_EMAIL)) {
-                $_SESSION['email_error'] = 'Bad Request: đây không phải là email.';
-
-                throw new Exception(' Bad Request: đây không phải là email.');
-            }
-            if (!array_key_exists('password', $user) || empty($user['password'])) {
-
-                $_SESSION['password_error'] = 'Mậc khẩu trống.';
-
-                throw new Exception(' Bad Request: Mậc khẩu trống.');
-            }
-            if (strlen($user['password']) > 20) {
-
-                $_SESSION['password_error'] = 'Mật khẩu không được quá 20 ký tự.';
-
-                throw new Exception(' Bad Request: Mật khẩu không được quá 20 ký tự.');
-            }
-            // Rest of your code...
-        } catch (Exception $ex) {
-
-            //exceoption được run hoặc là dính lỗi hàm không tồn tại ,cú pháp thì nó vẩn chyaj exception
-            echo $ex->getMessage(); // lấy thông tin từ exceptio("chuổi abc") -> ném chuổi này ra
-            //  echo $ex->getFile();
-            // echo $ex->getLine();
-            http_response_code(400);
-            // echo '<script>alert("' . $ex->getMessage() . '");</script>';
-            // echo '<script>window.location.replace("login_get");</script>'; // Chuyển hướng đến trang khác nếu cần
-            // echo "co loi";
-            //exit(); // Dừng việc thực thi tiếp theo
-
+        //session_start();
+        if (!isset($user['email']) || empty($user['email'])) {
+            $_SESSION['email_error'] = 'email trống.';
+            http_response_code(500);
+            throw new Exception(' Bad Request: email trống.');
         }
+
+        if (!filter_var($user['email'], FILTER_VALIDATE_EMAIL)) {
+            $_SESSION['email_error'] = 'Bad Request: đây không phải là email.';
+            http_response_code(500);
+            throw new Exception(' Bad Request: đây không phải là email.');
+        }
+        if (!array_key_exists('password', $user) || empty($user['password'])) {
+
+            $_SESSION['password_error'] = 'Mậc khẩu trống.';
+            http_response_code(500);
+
+
+            throw new Exception(' Bad Request: Mậc khẩu trống.');
+        }
+        if (strlen($user['password']) > 20) {
+
+            $_SESSION['password_error'] = 'Mật khẩu không được quá 20 ký tự.';
+            http_response_code(500);
+            throw new Exception(' Bad Request: Mật khẩu không được quá 20 ký tự.');
+        }
+        // Rest of your code...
+
+        //exceoption được run hoặc là dính lỗi hàm không tồn tại ,cú pháp thì nó vẩn chyaj exception
+        //echo $ex->getMessage(); // lấy thông tin từ exceptio("chuổi abc") -> ném chuổi này ra
+        //  echo $ex->getFile();
+        // echo $ex->getLine();
+        //http_response_code(500);
+        // echo '<script>alert("' . $ex->getMessage() . '");</script>';
+        // echo '<script>window.location.replace("login_get");</script>'; // Chuyển hướng đến trang khác nếu cần
+        // echo "co loi";
+        //exit(); // Dừng việc thực thi tiếp theo
+
+
     }
 
 

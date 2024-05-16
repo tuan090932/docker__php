@@ -39,21 +39,9 @@ class ProductController extends BaseController
             // require_once '../app/Views/product/product_list.php';
             require_once '../app/Views/product/product_list.php';
         } else {
-            header('Location:/login_get');
+            header('Location:/login');
             exit();
         }
-
-
-        //    try {
-        //       if (isset($_COOKIE['username'])) {
-        //         } else {
-        //             throw new Exception("Cookie 'loggedin' is not set or false");
-        //         }
-        //     } catch (Exception $e) {
-        //         error_log($e->getMessage());
-        //         header('Location:/login_get');
-        //         exit();
-        //     }
     }
 
     public function createProduct()
@@ -72,39 +60,48 @@ class ProductController extends BaseController
     {
 
 
+        if ($_SESSION['admin'] == true) {
 
 
-        if (isset($_POST['id'])) {
-            $name = $_POST['name'];
-            $price = $_POST['price'];
-            $brand_name = $_POST['brand_name'];
-
-            // Handle file upload
-            $image = null;
-            if (isset($_FILES['image'])) {
-                $target_dir = "./image/";
-                if (!is_dir($target_dir)) {
-                    echo "Directory does not exist: $target_dir";
-                } elseif (!is_writable($target_dir)) {
-                    echo "Directory is not writable: $target_dir";
-                } else {
-                    $target_file = $target_dir . basename($_FILES["image"]["name"]);
-                    if (move_uploaded_file($_FILES["image"]["tmp_name"], $target_file)) {
-                        $image = $target_file;
-                        echo "Upload successful";
+            if (isset($_POST['id'])) {
+                $name = $_POST['name'];
+                $price = $_POST['price'];
+                $brand_name = $_POST['brand_name'];
+                // Handle file upload
+                $image = null;
+                if (isset($_FILES['image'])) {
+                    $target_dir = "./image/";
+                    if (!is_dir($target_dir)) {
+                        echo "Directory does not exist: $target_dir";
+                    } elseif (!is_writable($target_dir)) {
+                        echo "Directory is not writable: $target_dir";
                     } else {
-                        echo "Sorry, there was an error uploading your file.";
+                        $target_file = $target_dir . basename($_FILES["image"]["name"]);
+
+
+                        if (move_uploaded_file($_FILES["image"]["tmp_name"], $target_file)) {
+                            $image = $target_file;
+                            echo "Upload successful";
+                        } else {
+                            echo "Sorry, there was an error uploading your file.";
+                        }
                     }
                 }
-            }
-            $product = [
-                'name' => $name,
-                'price' => $price,
-                'image' => $image,
-                'brand_name' => $brand_name,
-            ];
+                $product = [
+                    'name' => $name,
+                    'price' => $price,
+                    'image' => $image,
+                    'brand_name' => $brand_name,
+                ];
 
-            $this->productModel->createProductImage($product);
+                $this->productModel->createProductImage($product);
+                session_start();
+                $_SESSION['statusCreateProduct'] = "Tạo sản phẩm thành công";
+                header('Location:/createProduct');
+            }
+        } else {
+            $_SESSION['warning'] = "bạn không có quyền truy cập vào trang này ";
+            header('Location:/');
         }
     }
 
@@ -112,24 +109,17 @@ class ProductController extends BaseController
     {
         //output tất cả product với brand_id
 
-        if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on')
-            $url = "https://";
-        else
-            $url = "http://";
-        $url .= $_SERVER['HTTP_HOST'];
-        $url .= $_SERVER['REQUEST_URI'];
-        $urlParts = parse_url($url);
-        $url = $urlParts;
+        if ($this->handleLoginService->checkSession()) {
 
-        // Split the path by '/'
-        $pathParts = explode('/', $url['path']);
-        // Get the last part of the path, which should be the final value
-        $finalValue = end($pathParts);
-        //echo $finalValue;
-        $products = $this->productModel->getProductByBrand($finalValue);
-        //$products = $this->productModel->getProductByBrand()
 
-        require_once '../app/Views/product/showProduct.php';
+            $finalValue = $this->handleLoginService->convertURLToFinalValue();
+            $products = $this->productModel->getProductByBrand($finalValue);
+            //$products = $this->productModel->getProductByBrand()
+            require_once '../app/Views/product/showProductByBrand.php';
+        } else {
+            header('Location:/login');
+        }
+
 
         // $Brand = $this->BrandModel->getAllBrand();
         //  exit;
@@ -140,22 +130,20 @@ class ProductController extends BaseController
 
     public function productListByIdGet()
     {
-        if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on')
-            $url = "https://";
-        else
-            $url = "http://";
-        $url .= $_SERVER['HTTP_HOST'];
-        $url .= $_SERVER['REQUEST_URI'];
-        $urlParts = parse_url($url);
-        $url = $urlParts;
 
-        // Split the path by '/'
-        $pathParts = explode('/', $url['path']);
-        // Get the last part of the path, which should be the final value
-        $finalValue = end($pathParts);
 
-        $product = $this->productModel->getProductById($finalValue);
-        require_once '../app/Views/product/view_Product.php';
+
+        if ($this->handleLoginService->checkSession()) {
+
+            $finalValue = $this->handleLoginService->convertURLToFinalValue();
+            $product = $this->productModel->getProductById($finalValue);
+            require_once '../app/Views/product/view_Product.php';
+        } else {
+            header('Location:/login');
+        }
+
+
+
 
         //input id-> output 1 product
     }
@@ -230,18 +218,18 @@ class ProductController extends BaseController
             // Get the last part of the path, which should be the final value
             $finalValue = end($pathParts);
             echo $finalValue;
-
-
             // Delete or update rows in the cart table that reference the product
-
             // Now you can delete the product
             //$this->productModel->deleteProduct($id);
-
             $this->cartModel->deleteCartById($finalValue);
-
-
             $product = $this->productModel->deleteProduct($finalValue);
+
+            // Redirect to the product list page
+            session_start();
+            $_SESSION['statusDeleteProduct'] = "delete thành công";
+            header('Location:/');
         } else {
+
             $_SESSION['warning'] = "bạn không có quyền truy cập vào trang này ";
             header('Location:/');
         }
@@ -258,12 +246,10 @@ class ProductController extends BaseController
 
     function getAllBrand()
     {
-
         session_start();
         // Tách tên tệp từ đường dẫn đến tệp
         if ($_SESSION['admin'] == true) {
             $brand =  $this->brandModel->getAllBrand();
-            echo "hello";
             require_once '../app/Views/product/showBrand.php';
         } else {
             $_SESSION['warning'] = "bạn không có quyền truy cập vào trang này ";
@@ -272,16 +258,6 @@ class ProductController extends BaseController
 
         // Trả về tên tệp đã xử lý
     }
-
-    function getAddBrand($id_brand)
-    {
-        // Tách tên tệp từ đường dẫn đến tệp
-        $brand =  $this->brandModel->getAllBrand();
-        require_once '../app/Views/product/showBrand.php';
-
-        // Trả về tên tệp đã xử lý
-    }
-
     function postAddBrand($id_brand)
     {
         // Tách tên tệp từ đường dẫn đến tệp
@@ -293,6 +269,24 @@ class ProductController extends BaseController
 
     public function handleEdit()
     {
+
+
+
+
+
+
+        //  1 if (isset($_FILES['image'])) {: Kiểm tra xem có file hình ảnh được tải lên thông qua form không.
+        //  2   $target_dir = "./image/";: Đặt thư mục mục tiêu để lưu trữ hình ảnh được tải lên.
+        //   3  if (!is_dir($target_dir)) {: Kiểm tra xem thư mục mục tiêu có tồn tại không.         
+        //    4  echo "Directory does not exist: $target_dir";: Nếu thư mục không tồn tại, in ra thông báo.         
+        //    5  } elseif (!is_writable($target_dir)) {: Nếu thư mục tồn tại, kiểm tra xem nó có thể ghi được không.        
+        //    6  echo "Directory is not writable: $target_dir";: Nếu thư mục không thể ghi, in ra thông báo.     
+        //    7  } else {: Nếu thư mục tồn tại và có thể ghi, tiếp tục xử lý.       
+        //    8  $target_file = $target_dir . basename($_FILES["image"]["name"]);: Tạo đường dẫn tệp mục tiêu bằng cách nối thư mục mục tiêu với tên của tệp hình ảnh.  
+        //   9  if (move_uploaded_file($_FILES["image"]["tmp_name"], $target_file)) {: Di chuyển tệp đã tải lên từ vị trí tạm thời đến vị trí mục tiêu.      
+        //   10  $image = $target_file;: Nếu việc di chuyển tệp thành công, đặt biến $image bằng đường dẫn tệp mục tiêu.
+        //   11echo "Upload successful";: In ra thông báo tải lên thành công.
+
         if (isset($_POST['id'])) {
             $name = $_POST['name'];
             $price = $_POST['price'];
@@ -304,6 +298,7 @@ class ProductController extends BaseController
                 $target_dir = "./image/";
                 if (!is_dir($target_dir)) {
                     echo "Directory does not exist: $target_dir";
+                    //folder
                 } elseif (!is_writable($target_dir)) {
                     echo "Directory is not writable: $target_dir";
                 } else {
@@ -311,6 +306,10 @@ class ProductController extends BaseController
                     if (move_uploaded_file($_FILES["image"]["tmp_name"], $target_file)) {
                         $image = $target_file;
                         echo "Upload successful";
+                        //          ./image/xiaomi-11-pro.png
+                        // basename=xiaomi-11-pro.png
+                        //$target_file là folder muốn dy chuyển tới
+                        //$_FILES["image"]["tmp_name"]: Đây là đường dẫn tới tệp tạm thời trên máy chủ nơi tệp đã tải lên được
                     } else {
                         echo "Sorry, there was an error uploading your file.";
                     }
@@ -324,7 +323,11 @@ class ProductController extends BaseController
                 'brand_name' => $brand_name,
             ];
 
-            $this->productModel->editProduct($_POST['id'], $product);
+            if ($this->productModel->editProduct($_POST['id'], $product)) {
+                session_start();
+                $_SESSION['statusEditProduct'] = "Sửa sản phẩm thành công";
+                header('Location:/');
+            }
         }
     }
 

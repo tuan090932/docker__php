@@ -45,7 +45,7 @@ session_start();
         </div>
     </nav>
     <main class="container">
-        <form action="<?= BASE_PATH ?>/product/edit" method="post" enctype="multipart/form-data">
+        <form action="/product/edit" method="post" enctype="multipart/form-data">
 
             <div class="form-group">
                 <label for="name">Name:</label>

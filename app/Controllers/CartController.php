@@ -62,11 +62,15 @@ class CartController extends BaseController
     public function handlePostCart()
     {
 
+        // thêm sản phẩm vô giỏ hàng
         $user_id = $_POST['user_id'];
         $product_id = $_POST['product_id'];
-
         //echo $this->CartModel->getAllCart();
-        $this->CartModel->insertCart($user_id, $product_id);
+        if ($this->CartModel->insertCart($user_id, $product_id)) {
+            session_start();
+            $_SESSION['statusInsertCart'] = "thêm vào giỏ hàng thành công";
+            header("Location:/");
+        }
         //echo "thanh còng";
 
     }

@@ -8,6 +8,12 @@ class CartModel extends BaseModel
 {
     public function getAllCart($userId)
     {
+
+        // cart và product dựa trên điều kiện cart.product_id = product.id
+        //Đoạn truy vấn SQL này được sử dụng để lấy tất cả các thông tin về sản phẩm từ bảng product
+        // mà người dùng đã thêm vào giỏ hàng.
+        //cart.user_info_id = :userId điều kiện
+        //phép hết product với cart product để có thêm colum
         try {
             $this->db->query("SELECT product.* FROM cart JOIN product ON cart.product_id = product.id WHERE cart.user_info_id = :userId");
             $this->db->bind(':userId', $userId);
@@ -25,6 +31,7 @@ class CartModel extends BaseModel
             $this->db->bind(':product_id', $idProduct);
             $this->db->bind(':quantity', 1); // assuming quantity is 1
             $this->db->execute();
+            return true;
         } catch (Exception $e) {
             echo 'Caught exception: ',  $e->getMessage(), "\n";
         }

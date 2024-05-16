@@ -58,34 +58,21 @@ session_start();
 
 
     <div class="container">
-        <img src="/image/tiki.png" alt="Banner Quảng cáo Shop Sách! 1" style="width:100%;">
-
-        <li class="nav-item">
-            <a class="nav-link" href="<?= BASE_PATH ?>/logout_post">Đăng xuất</a>
-        </li>
-
         <div class="row">
             <?php foreach ($products as $product) { ?>
                 <div class="col-md-4">
                     <div class="card mb-4 shadow-sm">
                         <?php
-                        //echo "<img src=\"/image/iphone13.jpg\" alt=\"\" class=\"card-img-top img-thumbnail img-fluid\" width=\"200\" height=\"200\">";
 
-                        echo $product['price'];
-                        echo $product['name'];
-
-                        // echo $product['image'];
-
-                        //echo $product['image'];
-                        echo "<img src=\"/{$product['image']}\" alt=\"\" class=\"card-img-top img-thumbnail img-fluid\" width=\"200\" height=\"200\">";
+                        echo "<img src=\"/{$product['image']}\" alt=\"\" class=\"card-img-top img-thumbnail img-fluid\" style=\"max-width:300px; max-height:200px;\">";
                         ?>
 
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center">
-                                <h1 class="text-muted"><?= $product['name'] ?></h1>
+                                <h2 class="text-muted"><?= $product['name'] ?></h2>
 
-
-                                <h1 class="text-muted"><?= $product['price'] ?></h1>
+                                <h4>giá:</h4>
+                                <h3 class="text-muted"><?= $product['price'] ?></h3>
                             </div>
                         </div>
                     </div>

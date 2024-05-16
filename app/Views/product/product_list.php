@@ -75,10 +75,9 @@
                     </div>
                 </li>
             </ul>
-            <form action="/product/list/search" method="get" class="form-inline my-2 my-lg-0 ml-auto">
-                <input class="form-control mr-sm-2" type="search" placeholder="Tìm kiếm sách" aria-label="Search" name="query">
-                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Tìm kiếm</button>
-            </form>
+
+            <h1><?php echo $_COOKIE['username']; ?></h1>
+
         </div>
     </nav>
 
@@ -101,7 +100,23 @@
                 echo $_SESSION['errorMessage'];
                 unset($_SESSION['errorMessage']);
             }
+
+
+            if (isset($_SESSION['statusDeleteProduct'])) {
+                echo $_SESSION['statusDeleteProduct'];
+                unset($_SESSION['statusDeleteProduct']);
+            }
+            if (isset($_SESSION['statusEditProduct'])) {
+                echo $_SESSION['statusEditProduct'];
+                unset($_SESSION['statusEditProduct']);
+            }
+
+            if (isset($_SESSION['statusInsertCart'])) {
+                echo $_SESSION['statusInsertCart'];
+                unset($_SESSION['statusInsertCart']);
+            }
             ?>
+
 
         </h1>
 
@@ -117,37 +132,26 @@
                 <div class="col-md-4">
                     <div class="card mb-4 shadow-sm">
                         <?php
-                        //echo "<img src=\"/image/iphone13.jpg\" alt=\"\" class=\"card-img-top img-thumbnail img-fluid\" width=\"200\" height=\"200\">";
-
-                        // echo $product['image'];
-
-                        echo "<img src=\"/{$product['image']}\" alt=\"\" class=\"card-img-top img-thumbnail img-fluid\" width=\"200\" height=\"200\">";
+                        echo "<img src=\"/{$product['image']}\" alt=\"\" class=\"card-img-top img-thumbnail img-fluid\" style=\"max-width:300px; max-height:100px;\">";
                         ?>
-
                         <div class="card-body">
                             <h5 class="card-title"><?= $product['brand_name'] ?></h5>
                             <div class="d-flex justify-content-between align-items-center">
-                                <h1 class="text-muted"><?= $product['name'] ?></h1>
-
-                                <div class="btn-group">
-                                    <a href="view/<?= $product['id'] ?>" class="btn btn-sm btn-outline-secondary">View</a>
-                                    <?php
-
-                                    if (isset($_SESSION['admin']) && $_SESSION['admin'] == true) {
-                                        echo '<a href="form_editProduct/' . $product['id'] . '" class="btn btn-sm btn-outline-secondary">Edit</a>';
-                                    }
-                                    ?>
-
-                                    <li class="nav-item">
-                                        <?php
-                                        if (isset($_SESSION['admin']) && $_SESSION['admin'] == true) {
-                                            echo '<a href="delete/' . $product['id'] . '" class="btn btn-sm btn-outline-secondary">Delete</a>';
-                                        }
-                                        ?>
-                                    </li>
+                                <div>
+                                    <h3 class="text-muted"><?= $product['name'] ?></h3>
+                                    <!-- Add the additional price here -->
                                 </div>
+                                <div class="btn-group">
+                                    <a href="view/<?= $product['id'] ?>" class="btn btn-sm btn-outline-secondary align-btn">View</a>
+                                    <?php if (isset($_SESSION['admin']) && $_SESSION['admin'] == true) { ?>
+                                        <a href="form_editProduct/<?= $product['id'] ?>" class="btn btn-sm btn-outline-secondary align-btn">Edit</a>
+                                        <a href="delete/<?= $product['id'] ?>" class="btn btn-sm btn-outline-secondary align-btn">Delete</a>
+                                    <?php } ?>
+                                </div>
+                                <h2>giá:</h2>
                                 <h1 class="text-muted"><?= $product['price'] ?></h1>
                             </div>
+
                         </div>
                     </div>
                 </div>
@@ -179,5 +183,14 @@ include "../app/Views/components/footer.php";
         /* Độ cong của góc container */
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         /* Hiệu ứng bóng */
+    }
+
+    .align-btn {
+        height: 36px;
+        /* Adjust the height as needed */
+        line-height: 36px;
+        /* Adjust the line height as needed */
+        margin-right: 5px;
+        /* Add margin between buttons */
     }
 </style>

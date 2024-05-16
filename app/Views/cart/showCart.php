@@ -1,5 +1,4 @@
 <?php
-session_start();
 ?>
 
 <!DOCTYPE html>
@@ -61,7 +60,7 @@ session_start();
             <div class="col-md-4">
                 <div class="card mb-4 shadow-sm">
                     <?php
-                    echo "<img src=\"/{$product['image']}\" alt=\"\" class=\"card-img-top img-thumbnail img-fluid\" width=\"200\" height=\"200\">";
+                    echo "<img src=\"/{$product['image']}\" alt=\"\" class=\"card-img-top img-thumbnail img-fluid\" style=\"max-width:200px; max-height:200px;\">";
                     ?>
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">

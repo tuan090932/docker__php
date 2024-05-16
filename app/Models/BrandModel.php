@@ -44,7 +44,7 @@ class BrandModel extends BaseModel
             $this->db->bind(':id', $idBrand);
             $result = $this->db->resultSet();
             if ($result) {
-                $_SESSION['errorDeleteBrand'] = "không thể xóa thương hiệu này vì có sản phẩm thuộc thương hiệu này";
+                $_SESSION['errorDeleteBrand'] = "không thể xóa thương hiệu này vì có sản phẩm thuộc thương hiệu này đang trong giỏ hàng";
                 throw new Exception("không thể xóa thương hiệu này vì có sản phẩm thuộc thương hiệu này");
             }
             if ($result == false) {

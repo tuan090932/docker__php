@@ -80,16 +80,18 @@
                             <a href="register">Create an
                                 account</a>
                         </p>
-                        <span> <?php
+                        <h1 style="color:yellowgreen"> <?php
+                                                        if (isset($_SESSION['sussessfulCreateAccout'])) {
+                                                            echo $_SESSION['sussessfulCreateAccout'];
+                                                            unset($_SESSION['sussessfulCreateAccout']);
+                                                        }
 
-                                // $_SESSION["message"];
-                                if (isset($_SESSION["message"])) {
-                                    echo $_SESSION["message"];
-                                    unset($_SESSION["message"]); // delete sesion này
-                                } else {
-                                }
 
-                                ?> </span>
+
+
+                                                        // $_SESSION["message"];
+
+                                                        ?> </h1>
                     </div>
                 </div>
             </div>

@@ -50,6 +50,15 @@
             <button type="submit" class="btn bg-success">
                 Submit
             </button>
+
+            <h1 style="color:red">
+                <?php
+                if (isset($_SESSION['error_password'])) {
+                    echo $_SESSION['error_password'];
+                    unset($_SESSION['error_password']);
+                }
+                ?>
+            </h1>
         </form>
     </div>
 </body>
