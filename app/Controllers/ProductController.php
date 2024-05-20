@@ -33,14 +33,89 @@ class ProductController extends BaseController
     public function productList()
     {
 
+        //  require_once '../app/Views/product/product_list.php';
+
         if ($this->handleLoginService->checkSession()) {
-            $products = $this->productModel->getAllProducts();
+            $products = $this->productModel->getAllProducts(); //dùng phép kết để innner join
             $brands = $this->brandModel->getAllBrand();
             // require_once '../app/Views/product/product_list.php';
-            require_once '../app/Views/product/product_list.php';
+            //Như bạn có thể thấy, hàm compact() đã tạo một mảng có 
+            //các key là tên của các biến và giá trị tương ứng của chúng.
+            //ví dụ 
+            //$name = "GitHub Copilot";
+            //$role = "AI Programming Assistant";
+            //$data = compact('name', 'role');
+            //print_r($data);
+            //Array
+            //(
+            //    [name] => GitHub Copilot
+            //    [role] => AI Programming Assistant
+            //)
+
+
+
+
+
+
+
+
+
+
+
+
+
+            // echo "<pre>";
+
+            // // Function to get all classes in a specific namespace
+            // function getClassesInNamespace($namespace)
+            // {
+            //     $classes = [];
+            //     foreach (get_declared_classes() as $class) {
+            //         if (strpos($class, $namespace . '\\') === 0) {
+            //             $classes[] = $class;
+            //         }
+            //     }
+            //     return $classes;
+            // }
+
+            // // Define the namespaces you want to check
+            // $requiredNamespaces = [
+            //     'App\\Routing',
+            //     'App\\Controllers',
+            //     'App\\Services',
+            //     'App\\Models'
+            // ];
+
+            // // Loop through each namespace and display the classes in it
+            // foreach ($requiredNamespaces as $namespace) {
+            //     echo "Classes in {$namespace} namespace:\n";
+            //     $classes = getClassesInNamespace($namespace);
+            //     if (!empty($classes)) {
+            //         foreach ($classes as $class) {
+            //             echo $class . "\n";
+            //         }
+            //     } else {
+            //         echo "No classes found in this namespace.\n";
+            //     }
+            //     echo "\n";
+            // }
+
+            // echo "</pre>";
+            // exit;
+
+
+
+
+
+
+
+
+
+            $this->view("product.product_list", compact('products', 'brands'));
         } else {
+
             header('Location:/login');
-            exit();
+            // exit();
         }
     }
 
@@ -59,10 +134,7 @@ class ProductController extends BaseController
     public function handleCreateProduct()
     {
 
-
         if ($_SESSION['admin'] == true) {
-
-
             if (isset($_POST['id'])) {
                 $name = $_POST['name'];
                 $price = $_POST['price'];
@@ -104,35 +176,25 @@ class ProductController extends BaseController
             header('Location:/');
         }
     }
-
     public function handleFilterByBrand()
     {
         //output tất cả product với brand_id
-
         if ($this->handleLoginService->checkSession()) {
-
-
             $finalValue = $this->handleLoginService->convertURLToFinalValue();
             $products = $this->productModel->getProductByBrand($finalValue);
+            $brands = $this->brandModel->getAllBrand();
+
             //$products = $this->productModel->getProductByBrand()
             require_once '../app/Views/product/showProductByBrand.php';
         } else {
             header('Location:/login');
         }
-
-
         // $Brand = $this->BrandModel->getAllBrand();
         //  exit;
         // Render view with the filtered products
     }
-
-
-
     public function productListByIdGet()
     {
-
-
-
         if ($this->handleLoginService->checkSession()) {
 
             $finalValue = $this->handleLoginService->convertURLToFinalValue();
@@ -141,38 +203,17 @@ class ProductController extends BaseController
         } else {
             header('Location:/login');
         }
-
-
-
-
         //input id-> output 1 product
     }
 
     public function formEditProduct()
     {
-
-
-
-        session_start();
+        //session_start();
         // Tách tên tệp từ đường dẫn đến tệp
         if ($_SESSION['admin'] == true) {
-
-            if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on')
-                $url = "https://";
-            else
-                $url = "http://";
-            $url .= $_SERVER['HTTP_HOST'];
-            $url .= $_SERVER['REQUEST_URI'];
-            $urlParts = parse_url($url);
-            $url = $urlParts;
-
-            // Split the path by '/'
-            $pathParts = explode('/', $url['path']);
-            // Get the last part of the path, which should be the final value
-            $finalValue = end($pathParts);
+            $finalValue = $this->handleLoginService->convertURLToFinalValue();
             $Brand = $this->brandModel->getAllBrand();
             //$products = $this->productModel->getAllProducts();
-
             // echo $finalValue;
             //compact($finalValue);
             //require_once, các biến hiện tại được sử dụng trong phạm vi hàm gọi đó sẽ có thể truy cập được trong tệp tin được gọi
@@ -190,10 +231,12 @@ class ProductController extends BaseController
             echo $_GET['query'];
             //  $products = $this->productModel->searchProduct($_GET['query']);
             $products = $this->productModel->productSearch($_GET['query']);
+            $brands = $this->brandModel->getAllBrand();
+
             //echo $products;
             // $data = compact('products');
 
-            require_once '../app/Views/product/showProduct.php';
+            require_once '../app/Views/product/searchProduct.php';
             // $data = compact('products');
             // require_once '../app/Views/product_list.php';
         }
@@ -204,29 +247,16 @@ class ProductController extends BaseController
         // Tách tên tệp từ đường dẫn đến tệp
         if ($_SESSION['admin'] == true) {
 
-
-            if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on')
-                $url = "https://";
-            else
-                $url = "http://";
-            $url .= $_SERVER['HTTP_HOST'];
-            $url .= $_SERVER['REQUEST_URI'];
-            $urlParts = parse_url($url);
-            $url = $urlParts;
-            // Split the path by '/'
-            $pathParts = explode('/', $url['path']);
-            // Get the last part of the path, which should be the final value
-            $finalValue = end($pathParts);
-            echo $finalValue;
-            // Delete or update rows in the cart table that reference the product
-            // Now you can delete the product
-            //$this->productModel->deleteProduct($id);
+            $finalValue = $this->handleLoginService->convertURLToFinalValue();
             $this->cartModel->deleteCartById($finalValue);
-            $product = $this->productModel->deleteProduct($finalValue);
-
+            $result = $this->productModel->deleteProduct($finalValue);
             // Redirect to the product list page
             session_start();
-            $_SESSION['statusDeleteProduct'] = "delete thành công";
+            if ($result == true) {
+                $_SESSION['statusDeleteProduct'] = "delete thành công";
+            } else {
+                $_SESSION['statusDeleteProduct'] = "đả có 1 admin khác delete sản phẩm này";
+            }
             header('Location:/');
         } else {
 
@@ -269,12 +299,6 @@ class ProductController extends BaseController
 
     public function handleEdit()
     {
-
-
-
-
-
-
         //  1 if (isset($_FILES['image'])) {: Kiểm tra xem có file hình ảnh được tải lên thông qua form không.
         //  2   $target_dir = "./image/";: Đặt thư mục mục tiêu để lưu trữ hình ảnh được tải lên.
         //   3  if (!is_dir($target_dir)) {: Kiểm tra xem thư mục mục tiêu có tồn tại không.         
@@ -315,7 +339,6 @@ class ProductController extends BaseController
                     }
                 }
             }
-
             $product = [
                 'name' => $name,
                 'price' => $price,
@@ -347,44 +370,19 @@ class ProductController extends BaseController
         session_start();
 
         $idBrand = $this->handleLoginService->convertURLToFinalValue();
-        // exit;
         //session_start(); // PHẢI KHAI BÁO NÓ TRƯỚC KHI SỬ DỤNG
-
         $this->brandModel->deleteBrandById($idBrand);
     }
 
 
     public function handleViewProduct()
     {
-        // VarDumper::dump("helo");
-        if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on')
-            $url = "https://";
-        else
-            $url = "http://";
-        // Append the host(domain name, ip) to the URL.   
-        $url .= $_SERVER['HTTP_HOST'];
-        echo $url;
-        // Append the requested resource location to the URL   
-        $url .= $_SERVER['REQUEST_URI'];
-        // Phân tích URL
-        $urlParts = parse_url($url);
-        //echo $urlParts;
-        //  echo $urlParts;
-        // echo $urlParts['path'];
 
-        $url = $urlParts;
 
-        // Split the path by '/'
-        $pathParts = explode('/', $url['path']);
 
-        // Get the last part of the path, which should be the final value
-        $finalValue = end($pathParts);
-
-        echo $finalValue;
-
+        $finalValue = $this->handleLoginService->convertURLToFinalValue();
         $product = $this->productModel->getProductById($finalValue);
         echo "<script>alert('Title: " . $product['bookname'] . "\\nBody: " . $product['author'] . "');</script>";
-
         //require_once 'app/Views/product_detail.php';
     }
 }

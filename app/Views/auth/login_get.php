@@ -17,7 +17,7 @@
 <body>
     <h1 class="text-success text-center">
 
-        Book LE THE TUAN
+        LE THE TUAN
 
     </h1>
     <div class="container mt-5">
@@ -47,7 +47,6 @@
 
 
 
-
                             <div class="form-group">
                                 <div>
                                     <span style="color: red;"> <?php
@@ -64,6 +63,7 @@
                                 <label for="password">
                                     Password
                                 </label>
+
                                 <input type="password" name="password" class="form-control" id="password" />
                             </div>
 

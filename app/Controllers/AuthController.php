@@ -8,6 +8,7 @@ use App\Models\ProductModel;
 use App\Services\HandleLoginService;
 use App\Models\UserModel;
 
+
 class AuthController extends BaseController
 {
     private $productModel;
@@ -51,6 +52,7 @@ class AuthController extends BaseController
                         'email' => $email,
                         'password' => $password,
                     ];
+                    // muốn vô đây phải vô post man tích rem
                     $this->handleLoginService->handleLogin($user, $_POST['remember']);
                 }
 
@@ -66,10 +68,10 @@ class AuthController extends BaseController
                 }
             }
         } catch (exception $e) {
-            $errorMessage = $e->getMessage();
+
             if (strpos($_SERVER['HTTP_USER_AGENT'], 'Postman') !== false) {
                 // Nếu request đến từ Postman
-                echo $errorMessage; //echo này nó giúp postman tại login_post nhìn thấy
+                echo $e->getMessage(); //echo này nó giúp postman tại login_post nhìn thấy
                 http_response_code(400); // Đặt mã phản hồi HTTP thành 500
                 exit(); // Đảm bảo không thực hiện xử lý tiếp theo
             } else {
@@ -87,12 +89,21 @@ class AuthController extends BaseController
 
     public function postRegister()
     {
+
+
+
         $name = $_POST['name'];
         $email = $_POST['email'];
         $contact = $_POST['contact'];
         $password = $_POST['password'];
         $confirmPassword = $_POST['confirm_password'];
         $address = $_POST['Address'];
+
+        if ($this->userModel->CheckDuplicateEmail($email) == true) {
+            $_SESSION['error_email'] = 'vui lòng nhập lại email vì email này đã có trong hệ thống';
+            header('Location:/register');
+            exit;
+        }
         if ($password == $confirmPassword) {
             $user = [
                 'name' => $name,
@@ -108,7 +119,7 @@ class AuthController extends BaseController
         } else {
 
             $_SESSION['error_password'] = 'vui lòng nhập lại mậc khẩu vì không khớp';
-            //header('Location:/register');
+            header('Location:/register');
         }
     }
 
@@ -121,6 +132,11 @@ class AuthController extends BaseController
         setcookie("phone_number", "", time() - 3600, "/");
         setcookie("remember", "", time() - 3600, "/");
         setcookie("username", "", time() - 3600, "/");
+        setcookie("remaining_time", "", time() - 3600, "/");
+
+        setcookie("user_id", "", time() - 3600, "/");
+
+
         header('Location:/login');
     }
 }

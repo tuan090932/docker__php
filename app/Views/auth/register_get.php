@@ -57,6 +57,10 @@
                     echo $_SESSION['error_password'];
                     unset($_SESSION['error_password']);
                 }
+                if (isset($_SESSION['error_email'])) {
+                    echo $_SESSION['error_email'];
+                    unset($_SESSION['error_email']);
+                }
                 ?>
             </h1>
         </form>

@@ -1,5 +1,5 @@
 <?php
-session_start();
+//session_start();
 ?>
 
 
@@ -16,7 +16,7 @@ session_start();
 
 <body>
     <header class="mb-4">
-        <h1 class="text-center">Tạo Sản Phẩm Mới</h1>
+        <h1 class="text-center">Chỉnh Sữa Sản Phẩm</h1>
     </header>
     <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
 
@@ -73,7 +73,7 @@ session_start();
                     <?php endforeach; ?>
                 </select>
             </div>
-
+            <!-- đây là truyền  biến id lên ->  cho /product/edit xử lý -->
             <input type="hidden" name="id" value="<?= $finalValue ?>">
             <button type="submit" class="btn btn-primary">Create Product</button>
         </form>

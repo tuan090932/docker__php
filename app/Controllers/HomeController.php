@@ -10,6 +10,8 @@ class HomeController extends BaseController
 
         // $data = compact('products');
 
-        require_once '../app/Views/home.php';
+        $this->view("home");
+
+        // require_once '../app/Views/home.php';
     }
 }

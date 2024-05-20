@@ -28,28 +28,38 @@ class HandleLoginService extends BaseModel
     public function convertURLToFinalValue()
     {
 
-        // VarDumper::dump("helo");
-        if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on')
-            $url = "https://";
-        else
-            $url = "http://";
-        // Append the host(domain name, ip) to the URL.   
+
+        $url = '';
         $url .= $_SERVER['HTTP_HOST'];
-        //  echo $url;
+        //input url
+        //http://localhost/form_editProduct/40
+        //echo $_SERVER['HTTP_HOST'];
+        //ouput sẽ là localhost
+        //echo "<br>";
         // Append the requested resource location to the URL   
         $url .= $_SERVER['REQUEST_URI'];
+        //echo "<br>";
+        //echo $_SERVER['REQUEST_URI'];
+        //output sẽ là      /form_editProduct/40
         // Phân tích URL
         $urlParts = parse_url($url);
-        //echo $urlParts;
-        //  echo $urlParts;
-        // echo $urlParts['path'];
+        echo "<br>";
+        echo $urlParts['path'];
+        // echo     localhost/form_editProduct/40
+        //exit;
+        //$url = $urlParts;
 
-        $url = $urlParts;
+        // tách chưởi bởi dấu / ->localhost/form_editProduct/40->
+        // a[0],localhost,a[1],là form_editProduct, a[2] và 40 
+        $pathParts = explode('/', $urlParts['path']);
 
-        // Split the path by '/'
-        $pathParts = explode('/', $url['path']);
+        //echo "<br>";
+        //echo $pathParts[0]; // or another index depending on what you want to access
+        //echo $pathParts[1];
+        //echo $pathParts[2];
 
-        // Get the last part of the path, which should be the final value
+        //exit;
+        // lấy giá trị cuối cùng của mảng
         $finalValue = end($pathParts);
 
         return $finalValue;
@@ -58,6 +68,10 @@ class HandleLoginService extends BaseModel
     public function checkSession()
     {
         $sessionId = $_COOKIE['session_Id'] ?? null;
+
+
+
+
         if ($sessionId) {
             $this->db->query("SELECT * FROM session WHERE session_id = :session_id");
             $this->db->bind(':session_id', $sessionId);
@@ -87,8 +101,6 @@ class HandleLoginService extends BaseModel
 
         // Check if the email exists in the database
 
-
-
         if ($row) {
             // Verify the password
             if (password_verify($User['password'], $row['password'])) {
@@ -99,11 +111,11 @@ class HandleLoginService extends BaseModel
                     $_SESSION['admin'] = false;
                 }
 
+
                 // Password is correct, so start a new session
 
                 // Store data in session variables
                 // $session_Id = session_id(); // để sau này check mỗi lần request
-
 
                 $randomNumber = rand();
                 // dd($randomNumber);
@@ -111,7 +123,7 @@ class HandleLoginService extends BaseModel
                 // exit;
 
                 // Insert session_id into session table
-                $this->UserModel->insertSession($randomNumber);
+                $this->UserModel->insertSession($randomNumber, $row['username']);
                 $_SESSION["address"] = $row['address'];
                 $_SESSION["phone_number"] = $row['phone_number'];
 
@@ -119,6 +131,7 @@ class HandleLoginService extends BaseModel
                 if ($remember) {
 
                     //if()
+
                     $cookieExpiration = time() + (86400); // 86400 = 1 day
                     setcookie("user_id",  $row['id'], $cookieExpiration, "/");
                     setcookie("email",  $row['email_address'], $cookieExpiration, "/");
@@ -170,42 +183,26 @@ class HandleLoginService extends BaseModel
         //session_start();
         if (!isset($user['email']) || empty($user['email'])) {
             $_SESSION['email_error'] = 'email trống.';
-            http_response_code(500);
+            //http_response_code(400);
             throw new Exception(' Bad Request: email trống.');
         }
 
         if (!filter_var($user['email'], FILTER_VALIDATE_EMAIL)) {
-            $_SESSION['email_error'] = 'Bad Request: đây không phải là email.';
-            http_response_code(500);
+            $_SESSION['email_error'] = 'đây không phải là email.';
+            // http_response_code(400);
             throw new Exception(' Bad Request: đây không phải là email.');
         }
-        if (!array_key_exists('password', $user) || empty($user['password'])) {
+        if (empty($user['password'])) {
 
             $_SESSION['password_error'] = 'Mậc khẩu trống.';
-            http_response_code(500);
-
-
+            // http_response_code(400);
             throw new Exception(' Bad Request: Mậc khẩu trống.');
         }
         if (strlen($user['password']) > 20) {
-
             $_SESSION['password_error'] = 'Mật khẩu không được quá 20 ký tự.';
-            http_response_code(500);
+            // http_response_code(400);
             throw new Exception(' Bad Request: Mật khẩu không được quá 20 ký tự.');
         }
-        // Rest of your code...
-
-        //exceoption được run hoặc là dính lỗi hàm không tồn tại ,cú pháp thì nó vẩn chyaj exception
-        //echo $ex->getMessage(); // lấy thông tin từ exceptio("chuổi abc") -> ném chuổi này ra
-        //  echo $ex->getFile();
-        // echo $ex->getLine();
-        //http_response_code(500);
-        // echo '<script>alert("' . $ex->getMessage() . '");</script>';
-        // echo '<script>window.location.replace("login_get");</script>'; // Chuyển hướng đến trang khác nếu cần
-        // echo "co loi";
-        //exit(); // Dừng việc thực thi tiếp theo
-
-
     }
 
 

@@ -8,22 +8,13 @@ use Symfony\Component\VarDumper\VarDumper;
 use function App\Controllers\view;
 use Exception;
 
+//namespace App\Controllers;
 
-
-namespace App\Controllers;
-
-use App\Models\ProductModel;
+//use App\Models\ProductModel;
 use App\Models\BrandModel;
 use App\Models\CartModel;
-
 use App\Services\HandleLoginService;
-
 use App\Models\UserModel;
-
-
-
-
-
 
 class CartController extends BaseController
 {
@@ -44,21 +35,6 @@ class CartController extends BaseController
         $this->CartModel = new CartModel();
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     public function handlePostCart()
     {
 
@@ -77,14 +53,10 @@ class CartController extends BaseController
 
     public function getAllCart()
     {
-
         //echo $this->CartModel->getAllCart();
         $products = $this->CartModel->getAllCart(
             $_COOKIE['user_id']
         );
         require_once '../app/Views/cart/showCart.php';
-
-        //echo "thanh còng";
-
     }
 }

@@ -24,10 +24,8 @@ class Database
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
             );
             $this->dbh = new PDO($dsn, $this->user, $this->password, $options);
-
             // Truy vấn để lấy tên của tất cả các bảng trong cơ sở dữ liệu
             $stmt = $this->dbh->query("SHOW TABLES");
-
             // Fetch tất cả các tên bảng vào một mảng
             $tables = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
@@ -47,9 +45,18 @@ class Database
     }
     public function bind($param, $value, $type = null)
     {
+
+
+        //$this->db->bind(':id', $idBrand);
+
+
         if (is_null($type)) {
             switch (true) {
+                    //hàm sẽ tự động xác định loại dữ liệu của $value dựa trên giá trị của nó.
+                    //is_int trong PHP được sử dụng để kiểm tra xem một biến có phải là số nguyên hay khôn
+                    //nếu là số nguyên thì gán kiểu dữ liệu cho nó tiếp tục tới hết
                 case is_int($value):
+
                     $type = PDO::PARAM_INT;
                     break;
                 case is_bool($value):
@@ -58,10 +65,12 @@ class Database
                 case is_null($value):
                     $type = PDO::PARAM_NULL;
                     break;
-                default:
-                    $type = PDO::PARAM_STR;
+                default: //  còn lại thì cho là string
+                    $type = PDO::PARAM_STR; // PDO::PARAM_STR là một hằng số trong PHP Data Objects (PDO) mà đại diện cho kiểu dữ liệu chuỗi (string)
             }
         }
+
+        // ràng buộc $value với $param với loại dữ liệu được xác định bởi $type.
         $this->stmt->bindValue($param, $value, $type);
     }
     public function execute()

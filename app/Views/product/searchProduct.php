@@ -57,7 +57,7 @@
                         <?php
                         foreach ($brands as $brand) {
                         ?>
-                            <a class="dropdown-item" href="<?= "/brand/" . $brand['id'] ?>"><?= $brand['name'] ?></a>
+                            <a class="dropdown-item" href="<?= "brand/" . $brand['id'] ?>"><?= $brand['name'] ?></a>
                         <?php } ?>
                     </div>
                 </li>
@@ -126,14 +126,13 @@
                         <?php
                         echo "<img src=\"/{$product['image']}\" alt=\"\" class=\"card-img-top img-thumbnail img-fluid\" style=\"max-width:100%; height:auto;\">";                        ?>
                         <div class="card-body">
-                            <h5 class="card-title"><?= $product['brand_name'] ?></h5>
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
                                     <h3 class="text-muted"><?= $product['name'] ?></h3>
                                     <!-- Add the additional price here -->
                                 </div>
                                 <div class="btn-group">
-                                    <a href="view/<?= $product['id'] ?>" class="btn btn-sm btn-outline-secondary align-btn">View</a>
+                                    <a href="/view/<?= $product['id'] ?>" class="btn btn-sm btn-outline-secondary align-btn">View</a>
                                     <?php if (isset($_SESSION['admin']) && $_SESSION['admin'] == true) { ?>
                                         <a href="form_editProduct/<?= $product['id'] ?>" class="btn btn-sm btn-outline-secondary align-btn">Edit</a>
                                         <a href="delete/<?= $product['id'] ?>" class="btn btn-sm btn-outline-secondary align-btn">Delete</a>

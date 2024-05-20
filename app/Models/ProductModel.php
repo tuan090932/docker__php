@@ -52,7 +52,6 @@ class ProductModel extends BaseModel
         $this->db->query("INSERT INTO book (bookname, mota) VALUES(:bookname, :mota)");
         $this->db->bind(':bookname', $productData['bookname']);
         $this->db->bind(':mota', $productData['mota']);
-
         if ($this->db->execute()) {
             return true;
         } else {
@@ -62,6 +61,7 @@ class ProductModel extends BaseModel
 
     public function deleteProduct($id)
     {
+        //nếu bỏ dấu : là bị lỗi
         $this->db->query("DELETE FROM product WHERE id = :id");
         $this->db->bind(':id', $id);
 
@@ -74,8 +74,9 @@ class ProductModel extends BaseModel
 
     public function productSearch($query)
     {
-        $this->db->query("SELECT * FROM book WHERE bookname LIKE :query");
+        $this->db->query("SELECT * FROM product WHERE  name LIKE :query");
         $this->db->bind(':query', '%' . $query . '%');
+        //SELECT * FROM product WHERE name LIKE '%tuan%' // trả hết name -> thuộc ký thực tuan
         $results = $this->db->resultSet();
         return $results;
     }
